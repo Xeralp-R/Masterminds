@@ -1,35 +1,55 @@
 #include "ncurses.h"
-#include "letssee.h"
+#include "letssee.hpp"
 #include <thread>
 #include <chrono>
+#include <locale.h>
+
+// The structure that will contain color and boldness information.
+// Font-character information
+struct FC_info {
+    /*
+     * The permitted colors of any given character.
+     * Called Coloration because Color is defined in mastermind.cpp.
+    */
+    enum class Coloration{Naught, Red, Orange, Yellow, Green, Blue, Violet};
+
+    // The initialization of the enum class:
+    Coloration given_color = Coloration::Naught;
+};
 
 // The structure that will contain the outputted things.
 struct Output_con {
+    // The character that will be outputted
     std::string output_char;
+    // The x-dimension
     int x_dim;
+    // The y dimension
     int y_dim;
-    int wait_time; // in milliseconds
-    bool return_now; // Will I return?
-    char state_mod; // a modifier to make it bold or colored or something.
+    // The time to wait in milliseconds
+    int wait_time;
+    // Whether the char will return after couting
+    bool return_now; 
+    // a modifier to make it bold or colored or something.
+    FC_info state_mod; 
+    // to confirm if something is empty " "
+    const char empty = char(32);
 
     // Constructor for Output_con given string and x,y dim
-    Output_con(std::string str, int x1, int y1) :
+    Output_con(std::string str, int y1, int x1) :
         output_char(str), 
         x_dim(x1), 
         y_dim(y1), 
-        wait_time(15), 
-        return_now(true),
-        state_mod(char(32)) { }
+        wait_time(30), 
+        return_now(true) { }
     // Constructor for Output_con given all except mod
-    Output_con(std::string str, int x1, int y1, int wait, bool return_n) :
+    Output_con(std::string str, int y1, int x1, int wait, bool return_n) :
         output_char(str),
         x_dim(x1),
         y_dim(y1),
         wait_time(wait),
-        return_now(return_n),
-        state_mod(char(32)) {}
+        return_now(return_n) { }
     // Constructor for Output_con given all
-    Output_con(std::string str, int x1, int y1, int wait, bool return_n, char mod) :
+    Output_con(std::string str, int y1, int x1, int wait, bool return_n, FC_info mod) :
         output_char(str),
         x_dim(x1),
         y_dim(y1),
@@ -42,11 +62,11 @@ struct Output_con {
 namespace preparatory {
     // The general, overarching preparatory function.
     void startup();
-
+    
     class Title {
         public:
             // Constructor.
-            Title();
+            //Title();
 
             // Prints the title screen and accept the inputs given to it.
             void title_screen();
@@ -68,29 +88,41 @@ namespace preparatory {
             void title_screen_4();
         private:
             // The vector that will contain the borders and text of the title.
-            std::vector<Output_con> title_1_bord_1;
-            std::vector<Output_con> title_1_bord_2;
-            std::vector<Output_con> title_1_text;
+            std::vector<Output_con> title_1_bord_1 {};
+            std::vector<Output_con> title_1_bord_2 {};
+            std::vector<Output_con> title_1_text {};
 
             // The vectors that will contain the creators.
-            std::vector<Output_con> title_2_bord_1;
-            std::vector<Output_con> title_2_text;
+            std::vector<Output_con> title_2_bord_1 {};
+            std::vector<Output_con> title_2_text {};
 
             // The vectors that will contain the current settings.
-            std::vector<Output_con> title_3_subtitle;
-            std::vector<Output_con> title_3_border;
-            std::vector<Output_con> title_3_text;
+            std::vector<Output_con> title_3_subtitle {};
+            std::vector<Output_con> title_3_border {};
+            std::vector<Output_con> title_3_text {};
 
             // The vectors that will set up the menu.
-            std::vector<Output_con> title_4_subtitle;
-            std::vector<Output_con> title_4_border;
-            std::vector<Output_con> title_4_text;
+            std::vector<Output_con> title_4_subtitle {};
+            std::vector<Output_con> title_4_border {};
+            std::vector<Output_con> title_4_text {};
     };
 
     // Prints the help screen and accepts the inputs given to it.
     void help_screen();
 
-    int terminal_x = -1, terminal_y = -1;
+    // All of the private data that needs to be kept away from mastermind.
+    // Primarily helper functions and other such things.
+    namespace priv {
+        int terminal_x = -1, terminal_y = -1;
+
+        // Output the outputcons correctly
+        void printcon(std::vector<Output_con>& outputvec);
+
+        // Pass a vector of Output_cons to printcon.
+        // Meant to help with sweeping function.
+        void scanner(std::vector <Output_con>& granvec, std::vector <std::string> vecstr, int y_dimu, int x_dimu);
+    }
+    
 }
 
 
@@ -100,28 +132,55 @@ void preparatory::startup() {
     std::cout << "You will also require an \u001b[1m80-pixel width terminal or wider.\u001b[0m" << std::endl;
     std::cout << "The program will call an error if you are at neither." << std::endl;
     keep_window_open_cont();
-
+    /*
+    if (can_change_color() == false) {
+        std::cout << "Your terminal is unable to change colors."
+        "Due to this, the color orange may be invisible or discolored." << std::endl;
+        keep_window_open_cont();
+    }
+    */
     //call NCURSES
+    setlocale(LC_ALL, "");
     initscr();
-
+    
     // confirm that the screen is, in fact, at least 80 pixels wide
-    getmaxyx(stdscr, preparatory::terminal_y, preparatory::terminal_x);
+    getmaxyx(stdscr, preparatory::priv::terminal_y, preparatory::priv::terminal_x);
     // call error if not
-    if (preparatory::terminal_x < 80) {
+    if (preparatory::priv::terminal_x < 80) {
         error("Your screen is not wide enough to play this game.");
     }
-
+    if (has_colors() == false) {
+        error("Your terminal does not support colors.");
+    }
+    
+    start_color();
+    //printw("Hello!");
     // prepare the game title
     preparatory::Title Game_Title;
     Game_Title.preparatory::Title::title_screen();
-
+    refresh();
+    getch();
     endwin();
 }
 
 void preparatory::Title::title_screen() {
-	//printw("Hello World !!!");
+
     // wait for 1 second before beginning the run
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    // Define Orange
+    if (can_change_color() == true) {
+        init_color(COLOR_BLACK, 1000, 500, 0);
+    }
+
+    // Define color pairs
+    init_pair(1, COLOR_RED, use_default_colors());
+    init_pair(2, COLOR_BLACK, use_default_colors()); // Orange
+    init_pair(3, COLOR_YELLOW, use_default_colors());
+    init_pair(4, COLOR_GREEN, use_default_colors());
+    init_pair(5, COLOR_BLUE, use_default_colors());
+    init_pair(6, COLOR_MAGENTA, use_default_colors());
+
     // The title itself
     preparatory::Title::title_screen_1(
         preparatory::Title::title_1_bord_1,
@@ -130,7 +189,6 @@ void preparatory::Title::title_screen() {
     );
 
     // Move on to next part of screen
-    printw("\n");
 	refresh();
 	getch();
 }
@@ -148,4 +206,174 @@ void preparatory::Title::title_screen_1(
     to ensure that the program will not accidentally call it.
     */
 
+    // Top corner
+    title_1_bord_1.push_back(Output_con("┏", 0, 0));
+    // Left side
+    for (int i = 1; i <= 5; ++i) {
+        title_1_bord_1.push_back(Output_con("┃", i, 0));
+    }
+    // Bottom Left Corner
+    title_1_bord_1.push_back(Output_con("┗", 6, 0));
+    // Bottom Side
+    for (int i = 1; i <= 78; ++i) {
+        title_1_bord_1.push_back(Output_con("━", 6, i));
+    }
+    // Bottom Right Corner
+    title_1_bord_1.push_back(Output_con("┛", 6, 79));
+    // Right Side
+    for (int i = 5; i >= 1; --i) {
+        title_1_bord_1.push_back(Output_con("┃", i, 79));
+    }
+    // Top Right Corner
+    title_1_bord_1.push_back(Output_con("┓", 0, 79));
+    // Top side
+    for (int i = 78; i > 1; --i) {
+        title_1_bord_1.push_back(Output_con("━", 0, i));
+    }
+
+    preparatory::priv::printcon(title_1_bord_1);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    // Top side
+    for (int i = 4; i <= 75; ++i) {
+        title_1_bord_2.push_back(Output_con("═", 1, i));
+    }
+    // Left side
+    for (int i = 1; i <= 5; ++i) {
+        title_1_bord_2.push_back(Output_con("*", i, 77));
+    }
+    // Bottom side
+    for (int i = 75; i >= 4; --i) {
+        title_1_bord_2.push_back(Output_con("═", 5, i));
+    }
+    // Left side
+    for (int i = 5; i >= 1; --i) {
+        title_1_bord_2.push_back(Output_con("*", i, 2));
+    }
+
+    preparatory::priv::printcon(title_1_bord_2);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    
+    // M
+    preparatory::priv::scanner(title_1_text, {"╭", "│", "╵"}, 2, 8);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 9);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 10);
+    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 11);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 12);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 13);
+    preparatory::priv::scanner(title_1_text, {"╮", "│", "╵"}, 2, 14);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 15);
+    // A
+    preparatory::priv::scanner(title_1_text, {"╭", "├", "╵"}, 2, 16);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 17);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 18);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 19);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 20);
+    preparatory::priv::scanner(title_1_text, {"╮", "┤", "╵"}, 2, 21);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 22);
+    // S
+    preparatory::priv::scanner(title_1_text, {"╭", "╰", "╶"}, 2, 23);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 24);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 25);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 26);
+    preparatory::priv::scanner(title_1_text, {"╴", "╮", "╯"}, 2, 27);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 28);
+    // T
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 29);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 30);
+    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 31);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 32);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 33);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 34);
+    // E
+    preparatory::priv::scanner(title_1_text, {"┌", "├", "└"}, 2, 35);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 36);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 37);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 38);
+    preparatory::priv::scanner(title_1_text, {"╴", "╴", "╴"}, 2, 39);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 40);
+    // R
+    preparatory::priv::scanner(title_1_text, {"┌", "│", "╵"}, 2, 41);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 42);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 43);
+    preparatory::priv::scanner(title_1_text, {"─", "┬", "╰"}, 2, 44);
+    preparatory::priv::scanner(title_1_text, {"╮", "╯", "─"}, 2, 45);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 46);
+    // M
+    preparatory::priv::scanner(title_1_text, {"╭", "│", "╵"}, 2, 47);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 48);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 49);
+    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 50);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 51);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 52);
+    preparatory::priv::scanner(title_1_text, {"╮", "│", "╵"}, 2, 53);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 54);
+    // I
+    preparatory::priv::scanner(title_1_text, {"╶", " ", "╶"}, 2, 55);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 56);
+    preparatory::priv::scanner(title_1_text, {"┬", "│", "┴"}, 2, 57);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 58);
+    preparatory::priv::scanner(title_1_text, {"╴", " ", "╴"}, 2, 59);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 60);
+    // N
+    preparatory::priv::scanner(title_1_text, {"╭",  "│", "╵"}, 2, 61);
+    preparatory::priv::scanner(title_1_text, {"\\", " ", " "}, 2, 62);
+    preparatory::priv::scanner(title_1_text, {" ", "\\", " "}, 2, 63);
+    preparatory::priv::scanner(title_1_text, {" ", " ", "\\"}, 2, 64);
+    preparatory::priv::scanner(title_1_text, {"╷",  "│", "╯"}, 2, 65);
+    preparatory::priv::scanner(title_1_text, {" ",  " ", " "}, 2, 66);
+    // D
+    preparatory::priv::scanner(title_1_text, {"┌", "│", "└"}, 2, 67);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 68);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 69);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 70);
+    preparatory::priv::scanner(title_1_text, {"╮", "│", "╯"}, 2, 71);
+
+    preparatory::priv::printcon(title_1_text);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+void preparatory::priv::printcon(std::vector<Output_con>& outputvec) {
+    for (Output_con outputc : outputvec) {
+        // Move to the necessary location
+        move(outputc.y_dim, outputc.x_dim);
+
+        // Actually output the thing
+        if (outputc.state_mod.given_color == FC_info::Coloration::Naught) {
+            //we need to use c_str() because printw is a c-style function
+            printw(outputc.output_char.c_str());
+        } else {
+            attron(COLOR_PAIR(static_cast<int>(outputc.state_mod.given_color)));
+            printw(outputc.output_char.c_str());
+            attroff(COLOR_PAIR(static_cast<int>(outputc.state_mod.given_color)));
+        }
+
+        // If we need to return, return
+        if (outputc.return_now == true) {
+            refresh();
+        }
+
+        // Wait for the given time in milliseconds
+        std::this_thread::sleep_for(std::chrono::milliseconds(outputc.wait_time));
+    }
+}
+
+void preparatory::priv::scanner(
+    std::vector <Output_con>& granvec, 
+    std::vector <std::string> vecstr, 
+    int y_dimu,
+    int x_dimu
+) {
+    for (int i = 0; i < vecstr.size(); ++i) {
+        // Likely area for bugs
+        if (i != (vecstr.size()-1)) {
+            granvec.push_back(Output_con(vecstr[i], (y_dimu + i), x_dimu, round(30.0/vecstr.size()), false));
+        } else if (i == (vecstr.size()-1)) {
+            granvec.push_back(Output_con(vecstr[i], (y_dimu + i), x_dimu, round(30.0/vecstr.size()), true));
+            return;
+        }
+    }
 }
