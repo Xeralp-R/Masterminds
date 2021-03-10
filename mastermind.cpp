@@ -1,10 +1,10 @@
 /*
-Change Directory: cd ~/Desktop/ACodes/CPP_Files
+Change Directory: cd ~/Desktop/ACodes/CPP_Files/Masterminds && clang++ -std=c++11 -lncurses mastermind.cpp -o mastermind && ./mastermind
 Compile command:clang++ -std=c++11 -lncurses mastermind.cpp -o mastermind
 Run: ./mastermind
 */
-#include "ncurses.h"
-#include "letssee.h"
+//#include "ncurses.h"
+//#include "letssee.hpp"
 #include "mastermindprep.hpp"
 using namespace std;
 
