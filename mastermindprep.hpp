@@ -15,8 +15,8 @@ struct Output_con {
         Orange = 172, 
         Yellow = 220, 
         Green = 76, 
-        Blue = 45, 
-        Violet = 13
+        Blue = 27, 
+        Violet = 92
     };
     // The character that will be outputted
     std::string output_char;
@@ -170,7 +170,28 @@ namespace preparatory {
         // Meant to help with sweeping function.
         void scanner(std::vector <Output_con>& granvec, std::vector <std::string> vecstr, int y_dimu, int x_dimu);
 
+        // A scanner with color functionality.
+        // Created to avoid compatibility problems with the multiple given declarations.
+        void scanner(
+            std::vector <Output_con>& granvec, 
+            std::vector <std::string> vecstr, 
+            int y_dimu, 
+            int x_dimu, 
+            Output_con::Coloration col
+        );
+
+        // Center text, and then sweep from left to right.
         void center_lr(std::vector <Output_con>& granvec, std::string outstr, int y_dimu, int lastwait);
+
+        // Center text, whilst also providing colors.
+        // Created to avoid compatibility problems with previous declarations.
+        void center_lr(
+            std::vector <Output_con>& granvec, 
+            std::string outstr, 
+            int y_dimu, 
+            int lastwait, 
+            Output_con::Coloration col
+        );
     }
     
 }
@@ -220,16 +241,7 @@ void preparatory::Title::title_screen() {
 
     // wait for 1 second before beginning the run
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    /* This job goes to the printcons.
-    // Define color pairs
-    init_pair(1, 15, 0);
-    init_pair(2, COLOR_RED, 0);
-    init_pair(3, 172, 0); // Orange
-    init_pair(4, 220, 0); // Gold?
-    init_pair(5, COLOR_GREEN, 0);
-    init_pair(6, COLOR_BLUE, 0);
-    init_pair(7, COLOR_MAGENTA, 0);
-    */
+    
     // The title itself
     preparatory::Title::title_screen_1(
         preparatory::Title::title_1_bord_1,
@@ -298,19 +310,19 @@ void preparatory::Title::title_screen_1(
 
     // Top side
     for (int i = 4; i <= 75; ++i) {
-        title_1_bord_2.push_back(Output_con("═", 1, i));
+        title_1_bord_2.push_back(Output_con("═", 1, i, Output_con::Coloration::Violet));
     }
     // Left side
     for (int i = 1; i <= 5; ++i) {
-        title_1_bord_2.push_back(Output_con("*", i, 77));
+        title_1_bord_2.push_back(Output_con("*", i, 77, Output_con::Coloration::Violet));
     }
     // Bottom side
     for (int i = 75; i >= 4; --i) {
-        title_1_bord_2.push_back(Output_con("═", 5, i));
+        title_1_bord_2.push_back(Output_con("═", 5, i, Output_con::Coloration::Violet));
     }
     // Left side
     for (int i = 5; i >= 1; --i) {
-        title_1_bord_2.push_back(Output_con("*", i, 2));
+        title_1_bord_2.push_back(Output_con("*", i, 2, Output_con::Coloration::Violet));
     }
 
     preparatory::priv::printcon(title_1_bord_2);
@@ -318,79 +330,79 @@ void preparatory::Title::title_screen_1(
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     
     // M
-    preparatory::priv::scanner(title_1_text, {"╭", "│", "╵"}, 2, 8);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 9);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 10);
-    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 11);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 12);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 13);
-    preparatory::priv::scanner(title_1_text, {"╮", "│", "╵"}, 2, 14);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 15);
+    preparatory::priv::scanner(title_1_text, {"╭", "│", "╵"}, 2, 8, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 9, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 10, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 11, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 12, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 13, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"╮", "│", "╵"}, 2, 14, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 15, Output_con::Coloration::Yellow);
     // A
-    preparatory::priv::scanner(title_1_text, {"╭", "├", "╵"}, 2, 16);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 17);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 18);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 19);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 20);
-    preparatory::priv::scanner(title_1_text, {"╮", "┤", "╵"}, 2, 21);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 22);
+    preparatory::priv::scanner(title_1_text, {"╭", "├", "╵"}, 2, 16, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 17, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 18, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 19, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 20, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"╮", "┤", "╵"}, 2, 21, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 22, Output_con::Coloration::Yellow);
     // S
-    preparatory::priv::scanner(title_1_text, {"╭", "╰", "╶"}, 2, 23);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 24);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 25);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 26);
-    preparatory::priv::scanner(title_1_text, {"╴", "╮", "╯"}, 2, 27);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 28);
+    preparatory::priv::scanner(title_1_text, {"╭", "╰", "╶"}, 2, 23, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 24, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 25, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 26, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"╴", "╮", "╯"}, 2, 27, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 28, Output_con::Coloration::Yellow);
     // T
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 29);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 30);
-    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 31);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 32);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 33);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 34);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 29, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 30, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 31, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 32, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 33, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 34, Output_con::Coloration::Yellow);
     // E
-    preparatory::priv::scanner(title_1_text, {"┌", "├", "└"}, 2, 35);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 36);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 37);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 38);
-    preparatory::priv::scanner(title_1_text, {"╴", "╴", "╴"}, 2, 39);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 40);
+    preparatory::priv::scanner(title_1_text, {"┌", "├", "└"}, 2, 35, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 36, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 37, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 38, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"╴", "╴", "╴"}, 2, 39, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 40, Output_con::Coloration::Yellow);
     // R
-    preparatory::priv::scanner(title_1_text, {"┌", "│", "╵"}, 2, 41);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 42);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 43);
-    preparatory::priv::scanner(title_1_text, {"─", "┬", "╰"}, 2, 44);
-    preparatory::priv::scanner(title_1_text, {"╮", "╯", "─"}, 2, 45);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 46);
+    preparatory::priv::scanner(title_1_text, {"┌", "│", "╵"}, 2, 41, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 42, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 43, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", "┬", "╰"}, 2, 44, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"╮", "╯", "─"}, 2, 45, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 46, Output_con::Coloration::Yellow);
     // M
-    preparatory::priv::scanner(title_1_text, {"╭", "│", "╵"}, 2, 47);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 48);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 49);
-    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 50);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 51);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 52);
-    preparatory::priv::scanner(title_1_text, {"╮", "│", "╵"}, 2, 53);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 54);
+    preparatory::priv::scanner(title_1_text, {"╭", "│", "╵"}, 2, 47, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 48, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 49, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 50, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 51, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 52, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"╮", "│", "╵"}, 2, 53, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 54, Output_con::Coloration::Yellow);
     // I
-    preparatory::priv::scanner(title_1_text, {"╶", " ", "╶"}, 2, 55);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 56);
-    preparatory::priv::scanner(title_1_text, {"┬", "│", "┴"}, 2, 57);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 58);
-    preparatory::priv::scanner(title_1_text, {"╴", " ", "╴"}, 2, 59);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 60);
+    preparatory::priv::scanner(title_1_text, {"╶", " ", "╶"}, 2, 55, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 56, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"┬", "│", "┴"}, 2, 57, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 58, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"╴", " ", "╴"}, 2, 59, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 60, Output_con::Coloration::Yellow);
     // N
-    preparatory::priv::scanner(title_1_text, {"╭",  "│", "╵"}, 2, 61);
-    preparatory::priv::scanner(title_1_text, {"\\", " ", " "}, 2, 62);
-    preparatory::priv::scanner(title_1_text, {" ", "\\", " "}, 2, 63);
-    preparatory::priv::scanner(title_1_text, {" ", " ", "\\"}, 2, 64);
-    preparatory::priv::scanner(title_1_text, {"╷",  "│", "╯"}, 2, 65);
-    preparatory::priv::scanner(title_1_text, {" ",  " ", " "}, 2, 66);
+    preparatory::priv::scanner(title_1_text, {"╭",  "│", "╵"}, 2, 61, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"\\", " ", " "}, 2, 62, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", "\\", " "}, 2, 63, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ", " ", "\\"}, 2, 64, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"╷",  "│", "╯"}, 2, 65, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {" ",  " ", " "}, 2, 66, Output_con::Coloration::Yellow);
     // D
-    preparatory::priv::scanner(title_1_text, {"┌", "│", "└"}, 2, 67);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 68);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 69);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 70);
-    preparatory::priv::scanner(title_1_text, {"╮", "│", "╯"}, 2, 71);
+    preparatory::priv::scanner(title_1_text, {"┌", "│", "└"}, 2, 67, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 68, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 69, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 70, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(title_1_text, {"╮", "│", "╯"}, 2, 71, Output_con::Coloration::Yellow);
 
     preparatory::priv::printcon(title_1_text);
 
@@ -403,35 +415,35 @@ void preparatory::Title::title_screen_2(
 ) {
     // Top side, border
     for (int i = 0; i <= 19; ++i) {
-        title_2_border.push_back(Output_con("═", 8, (39 + i), 30, false));
-        title_2_border.push_back(Output_con("═", 8, (39 - i), 30, true));
+        title_2_border.push_back(Output_con("═", 8, (39 + i), 30, false, Output_con::Coloration::Blue));
+        title_2_border.push_back(Output_con("═", 8, (39 - i), 30, true, Output_con::Coloration::Blue));
     }
     // Top corners, border
-    title_2_border.push_back(Output_con("╔", 8, 19, 30, false));
-    title_2_border.push_back(Output_con("╗", 8, 59, 30, true));
+    title_2_border.push_back(Output_con("╔", 8, 19, 30, false, Output_con::Coloration::Blue));
+    title_2_border.push_back(Output_con("╗", 8, 59, 30, true, Output_con::Coloration::Blue));
     // Sides, border
     // Will try a 60 millisecond delay– will that work better?
     for (int i = 0; i <= 3; ++i) {
-        title_2_border.push_back(Output_con("║", (9 + i), 19, 60, false));
-        title_2_border.push_back(Output_con("║", (9 + i), 59, 60, true));
+        title_2_border.push_back(Output_con("║", (9 + i), 19, 60, false, Output_con::Coloration::Blue));
+        title_2_border.push_back(Output_con("║", (9 + i), 59, 60, true, Output_con::Coloration::Blue));
     }
     // Bottom corners, border
-    title_2_border.push_back(Output_con("╚", 13, 19, 30, false));
-    title_2_border.push_back(Output_con("╝", 13, 59, 30, true));
+    title_2_border.push_back(Output_con("╚", 13, 19, 30, false, Output_con::Coloration::Blue));
+    title_2_border.push_back(Output_con("╝", 13, 59, 30, true, Output_con::Coloration::Blue));
     // Bottom side, border
     for (int i = 19; i >= 0; --i) {
-        title_2_border.push_back(Output_con("═", 13, (39 + i), 30, false));
-        title_2_border.push_back(Output_con("═", 13, (39 - i), 30, true));
+        title_2_border.push_back(Output_con("═", 13, (39 + i), 30, false, Output_con::Coloration::Blue));
+        title_2_border.push_back(Output_con("═", 13, (39 - i), 30, true, Output_con::Coloration::Blue));
     }
 
     preparatory::priv::printcon(title_2_border);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    preparatory::priv::center_lr(title_2_text, "By:", 9, 120);
-    preparatory::priv::center_lr(title_2_text, "<=|   Rex Alphonse Reventar  |=>", 10, 120);
-    preparatory::priv::center_lr(title_2_text, "And:", 11, 120);
-    preparatory::priv::center_lr(title_2_text, "<=|      Brent Cristobal     |=>", 12, 120);
+    preparatory::priv::center_lr(title_2_text, "By:", 9, 120, Output_con::Coloration::Orange);
+    preparatory::priv::center_lr(title_2_text, "<=|   Rex Alphonse Reventar  |=>", 10, 120, Output_con::Coloration::Orange);
+    preparatory::priv::center_lr(title_2_text, "And:", 11, 120, Output_con::Coloration::Orange);
+    preparatory::priv::center_lr(title_2_text, "<=|      Brent Cristobal     |=>", 12, 120, Output_con::Coloration::Orange);
 
     preparatory::priv::printcon(title_2_text);
 
@@ -444,7 +456,7 @@ void preparatory::Title::title_screen_3 (
     std::vector<Output_con>& title_3_text
 ) {
     // The subtitle, "current settings"
-    preparatory::priv::center_lr(title_3_subtitle, "Current Settings:", 15, 120);
+    preparatory::priv::center_lr(title_3_subtitle, "Current Settings:", 15, 120, Output_con::Coloration::Green);
 
     preparatory::priv::printcon(title_3_subtitle);
 
@@ -515,6 +527,23 @@ void preparatory::priv::scanner(
     }
 }
 
+void preparatory::priv::scanner(
+    std::vector <Output_con>& granvec, 
+    std::vector <std::string> vecstr, 
+    int y_dimu, 
+    int x_dimu, 
+    Output_con::Coloration col
+) {
+    for (int i = 0; i < vecstr.size(); ++i) {
+        if (i != (vecstr.size()-1)) {
+            granvec.push_back(Output_con(vecstr[i], (y_dimu + i), x_dimu, round(30.0/vecstr.size()), false, col));
+        } else if (i == (vecstr.size()-1)) {
+            granvec.push_back(Output_con(vecstr[i], (y_dimu + i), x_dimu, round(30.0/vecstr.size()), true, col));
+            return;
+        }
+    }
+}
+
 void preparatory::priv::center_lr(
     std::vector <Output_con>& granvec, 
     std::string outstr, 
@@ -527,6 +556,26 @@ void preparatory::priv::center_lr(
     for (int i = 0; i < len; ++i) {
         std::string s(1, outstr[i]);
         granvec.push_back(Output_con(s, y_dimu, (dis + i)));
+        if (i == len-1) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(lastwait));
+            return;
+        }
+    }
+}
+
+void preparatory::priv::center_lr(
+    std::vector <Output_con>& granvec, 
+    std::string outstr, 
+    int y_dimu, 
+    int lastwait, 
+    Output_con::Coloration col
+) {
+    int len = outstr.length();
+    // Distance from side
+    int dis = 39 - static_cast<int>(floor(len/2.0));
+    for (int i = 0; i < len; ++i) {
+        std::string s(1, outstr[i]);
+        granvec.push_back(Output_con(s, y_dimu, (dis + i), col));
         if (i == len-1) {
             std::this_thread::sleep_for(std::chrono::milliseconds(lastwait));
             return;
