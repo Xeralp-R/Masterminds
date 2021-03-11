@@ -11,7 +11,7 @@ struct FC_info {
      * The permitted colors of any given character.
      * Called Coloration because Color is defined in mastermind.cpp.
     */
-    enum class Coloration{Naught, Red, Orange, Yellow, Green, Blue, Violet};
+    enum class Coloration{Naught = 1, Red, Orange, Yellow, Green, Blue, Violet};
 
     // The initialization of the enum class:
     Coloration given_color = Coloration::Naught;
@@ -64,6 +64,14 @@ struct Output_con {
         y_dim(y1),
         wait_time(wait),
         return_now(return_n),
+        state_mod(mod) {}
+    // Constructor given just a color
+    Output_con(std::string str, int y1, int x1, FC_info mod) :
+        output_char(str),
+        x_dim(x1),
+        y_dim(y1),
+        wait_time(30),
+        return_now(true),
         state_mod(mod) {}
 };
 
@@ -176,7 +184,9 @@ void preparatory::startup() {
     }
     
     start_color();
-    //printw("Hello!");
+    //use_default_colors();
+    wbkgd(stdscr, COLOR_PAIR(1));
+
     // prepare the game title
     preparatory::Title Game_Title;
     Game_Title.preparatory::Title::title_screen();
@@ -190,19 +200,14 @@ void preparatory::Title::title_screen() {
     // wait for 1 second before beginning the run
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    // Define Orange
-    if (can_change_color() == true) {
-        init_color(COLOR_BLACK, 1000, 500, 0);
-    }
-
     // Define color pairs
-    init_pair(0, COLOR_BLACK, COLOR_WHITE);
-    init_pair(1, COLOR_RED, COLOR_WHITE);
-    init_pair(2, COLOR_BLACK, COLOR_WHITE); // Orange
-    init_pair(3, COLOR_YELLOW, COLOR_WHITE);
-    init_pair(4, COLOR_GREEN, COLOR_WHITE);
-    init_pair(5, COLOR_BLUE, COLOR_WHITE);
-    init_pair(6, COLOR_MAGENTA, COLOR_WHITE);
+    init_pair(1, 15, 0);
+    init_pair(2, COLOR_RED, 0);
+    init_pair(3, 172, 0); // Orange
+    init_pair(4, 220, 0); // Gold?
+    init_pair(5, COLOR_GREEN, 0);
+    init_pair(6, COLOR_BLUE, 0);
+    init_pair(7, COLOR_MAGENTA, 0);
 
     // The title itself
     preparatory::Title::title_screen_1(
@@ -433,7 +438,17 @@ void preparatory::Title::title_screen_3 (
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     preparatory::priv::center_lr(title_3_text, "No Repeats, Randomized", 17, 500);
-    title_3_text.push_back(Output_con("R", 18, 33, 30, true, FC_info(FC_info::Coloration::Red)));
+    title_3_text.push_back(Output_con("R", 18, 33, FC_info(FC_info::Coloration::Red)));
+    title_3_text.push_back(Output_con(" ", 18, 34));
+    title_3_text.push_back(Output_con("O", 18, 35, FC_info(FC_info::Coloration::Orange)));
+    title_3_text.push_back(Output_con(" ", 18, 36));
+    title_3_text.push_back(Output_con("Y", 18, 37, FC_info(FC_info::Coloration::Yellow)));
+    title_3_text.push_back(Output_con(" ", 18, 38));
+    title_3_text.push_back(Output_con("G", 18, 39, FC_info(FC_info::Coloration::Green)));
+    title_3_text.push_back(Output_con(" ", 18, 40));
+    title_3_text.push_back(Output_con("B", 18, 41, FC_info(FC_info::Coloration::Blue)));
+    title_3_text.push_back(Output_con(" ", 18, 42));
+    title_3_text.push_back(Output_con("V", 18, 43, FC_info(FC_info::Coloration::Violet)));
 
     preparatory::priv::printcon(title_3_text);
 
@@ -446,7 +461,7 @@ void preparatory::priv::printcon(std::vector<Output_con>& outputvec) {
     for (Output_con outputc : outputvec) {
         // Move to the necessary location
         move(outputc.y_dim, outputc.x_dim);
-
+        /*
         // Actually output the thing
         if (outputc.state_mod.given_color == FC_info::Coloration::Naught) {
             //we need to use c_str() because printw is a c-style function
@@ -456,6 +471,11 @@ void preparatory::priv::printcon(std::vector<Output_con>& outputvec) {
             printw(outputc.output_char.c_str());
             attroff(COLOR_PAIR(static_cast<int>(outputc.state_mod.given_color)));
         }
+        */
+
+        attron(COLOR_PAIR(static_cast<int>(outputc.state_mod.given_color)));
+        printw(outputc.output_char.c_str());
+        attroff(COLOR_PAIR(static_cast<int>(outputc.state_mod.given_color)));
 
         // If we need to return, return
         if (outputc.return_now == true) {

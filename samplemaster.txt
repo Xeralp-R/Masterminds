@@ -16,7 +16,7 @@
 |                               Current Settings:                              |
 |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                        |
 |                            No Repeats, Randomized                            |
-|                                R O Y G B I V                                 |
+|                                 R O Y G B V                                  |
 |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                        |
 |             Press the arrow key, then enter, to make a selection.            |
 |           ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈           |
