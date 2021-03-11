@@ -109,28 +109,59 @@ namespace preparatory {
             // Prints the title screen and accept the inputs given to it.
             void title_screen();
 
-            // Prints the title itself.
-            void title_screen_1(
+            // Loads the title itself.
+            void title_screen_1l(
                 std::vector<Output_con>& title_1_bord_1, 
                 std::vector<Output_con>& title_1_bord_2, 
                 std::vector<Output_con>& title_1_text
             );
 
-            // Prints the creators.
-            void title_screen_2(
+            // Prints the title itself.
+            void title_screen_1p(
+                const std::vector<Output_con>& title_1_bord_1, 
+                const std::vector<Output_con>& title_1_bord_2, 
+                const std::vector<Output_con>& title_1_text
+            );
+
+            // Loads the creators.
+            void title_screen_2l(
                 std::vector<Output_con>& title_2_border,
                 std::vector<Output_con>& title_2_text
             );
 
-            // Prints the current settings.
-            void title_screen_3(
+            // Prints the creators.
+            void title_screen_2p(
+                const std::vector<Output_con>& title_2_border,
+                const std::vector<Output_con>& title_2_text
+            );
+
+            // Loads the current settings.
+            void title_screen_3l(
                 std::vector<Output_con>& title_3_subtitle,
                 std::vector<Output_con>& title_3_border,
                 std::vector<Output_con>& title_3_text
             );
 
+            // Prints the current settings.
+            void title_screen_3p(
+                const std::vector<Output_con>& title_3_subtitle,
+                const std::vector<Output_con>& title_3_border,
+                const std::vector<Output_con>& title_3_text
+            );
+
+            // Loads the menu.
+            void title_screen_4l(
+                std::vector<Output_con>& title_4_subtitle,
+                std::vector<Output_con>& title_4_border,
+                std::vector<Output_con>& title_4_text
+            );
+
             // Prints the menu.
-            void title_screen_4();
+            void title_screen_4p(
+                const std::vector<Output_con>& title_4_subtitle,
+                const std::vector<Output_con>& title_4_border,
+                const std::vector<Output_con>& title_4_text
+            );
         private:
             // The vector that will contain the borders and text of the title.
             std::vector<Output_con> title_1_bord_1 {};
@@ -164,13 +195,13 @@ namespace preparatory {
         static const int termwidth = 80;
 
         // Output the outputcons correctly
-        void printcon(std::vector<Output_con>& outputvec);
+        void const printcon (const std::vector<Output_con>& outputvec);
 
-        // Pass a vector of Output_cons to printcon.
+        // Pass a vertical vector of Output_cons to printcon.
         // Meant to help with sweeping function.
         void scanner(std::vector <Output_con>& granvec, std::vector <std::string> vecstr, int y_dimu, int x_dimu);
 
-        // A scanner with color functionality.
+        // Pass a vertical vector of Output_cons to printcon, with color functionality.
         // Created to avoid compatibility problems with the multiple given declarations.
         void scanner(
             std::vector <Output_con>& granvec, 
@@ -192,8 +223,35 @@ namespace preparatory {
             int lastwait, 
             Output_con::Coloration col
         );
+
+        // Pass a string, horizontal, and it's positions.
+        void passer_lr(
+            std::vector <Output_con>& granvec, 
+            std::string outstr, 
+            int y_dimu, 
+            int x_dimu, 
+            int lastwait
+        );
+
+        // Pass a string, horizontal, its positions, and the prefered color.
+        void passer_lr(
+            std::vector <Output_con>& granvec,
+            std::string outstr, 
+            int y_dimu, 
+            int x_dimu, 
+            Output_con::Coloration col
+        );
+
+        // Pass a string, horizontal, its positions, the last wait, and the prefered color.
+        void passer_lr(
+            std::vector <Output_con>& granvec,
+            std::string outstr, 
+            int y_dimu, 
+            int x_dimu, 
+            int lastwait,
+            Output_con::Coloration col
+        );
     }
-    
 }
 
 // ==> Definitions
@@ -243,22 +301,54 @@ void preparatory::Title::title_screen() {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     
     // The title itself
-    preparatory::Title::title_screen_1(
+    preparatory::Title::title_screen_1l(
+        preparatory::Title::title_1_bord_1,
+        preparatory::Title::title_1_bord_2,
+        preparatory::Title::title_1_text
+    );
+
+    preparatory::Title::title_screen_1p(
         preparatory::Title::title_1_bord_1,
         preparatory::Title::title_1_bord_2,
         preparatory::Title::title_1_text
     );
 
     // The creator boxes
-    preparatory::Title::title_screen_2(
+    preparatory::Title::title_screen_2l(
         preparatory::Title::title_2_border,
         preparatory::Title::title_2_text
     );
 
-    preparatory::Title::title_screen_3(
+    preparatory::Title::title_screen_2p(
+        preparatory::Title::title_2_border,
+        preparatory::Title::title_2_text
+    );
+
+    // The Current Settings
+    // TODO: make the current settings actual settings
+    preparatory::Title::title_screen_3l(
         preparatory::Title::title_3_subtitle,
         preparatory::Title::title_3_border,
         preparatory::Title::title_3_text
+    );
+
+    preparatory::Title::title_screen_3p(
+        preparatory::Title::title_3_subtitle,
+        preparatory::Title::title_3_border,
+        preparatory::Title::title_3_text
+    );
+
+    // The switching option
+    preparatory::Title::title_screen_4l(
+        preparatory::Title::title_4_subtitle,
+        preparatory::Title::title_4_border,
+        preparatory::Title::title_4_text
+    );
+
+    preparatory::Title::title_screen_4p(
+        preparatory::Title::title_4_subtitle,
+        preparatory::Title::title_4_border,
+        preparatory::Title::title_4_text
     );
 
     // Move on to next part of screen
@@ -266,7 +356,9 @@ void preparatory::Title::title_screen() {
 	getch();
 }
 
-void preparatory::Title::title_screen_1(
+// ==> Loaders
+
+void preparatory::Title::title_screen_1l(
     std::vector<Output_con>& title_1_bord_1, 
     std::vector<Output_con>& title_1_bord_2, 
     std::vector<Output_con>& title_1_text
@@ -279,6 +371,7 @@ void preparatory::Title::title_screen_1(
     to ensure that the program will not accidentally call it.
     */
 
+    // Border 1
     // Top corner
     title_1_bord_1.push_back(Output_con("┏", 0, 0));
     // Left side
@@ -304,10 +397,7 @@ void preparatory::Title::title_screen_1(
         title_1_bord_1.push_back(Output_con("━", 0, i));
     }
 
-    preparatory::priv::printcon(title_1_bord_1);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
+    // Border 2
     // Top side
     for (int i = 4; i <= 75; ++i) {
         title_1_bord_2.push_back(Output_con("═", 1, i, Output_con::Coloration::Violet));
@@ -324,11 +414,8 @@ void preparatory::Title::title_screen_1(
     for (int i = 5; i >= 1; --i) {
         title_1_bord_2.push_back(Output_con("*", i, 2, Output_con::Coloration::Violet));
     }
-
-    preparatory::priv::printcon(title_1_bord_2);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     
+    // Title Itself
     // M
     preparatory::priv::scanner(title_1_text, {"╭", "│", "╵"}, 2, 8, Output_con::Coloration::Yellow);
     preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 9, Output_con::Coloration::Yellow);
@@ -403,13 +490,9 @@ void preparatory::Title::title_screen_1(
     preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 69, Output_con::Coloration::Yellow);
     preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 70, Output_con::Coloration::Yellow);
     preparatory::priv::scanner(title_1_text, {"╮", "│", "╯"}, 2, 71, Output_con::Coloration::Yellow);
-
-    preparatory::priv::printcon(title_1_text);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
-void preparatory::Title::title_screen_2(
+void preparatory::Title::title_screen_2l(
     std::vector<Output_con>& title_2_border,
     std::vector<Output_con>& title_2_text
 ) {
@@ -436,29 +519,20 @@ void preparatory::Title::title_screen_2(
         title_2_border.push_back(Output_con("═", 13, (39 - i), 30, true, Output_con::Coloration::Blue));
     }
 
-    preparatory::priv::printcon(title_2_border);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
+    // Text
     preparatory::priv::center_lr(title_2_text, "By:", 9, 120, Output_con::Coloration::Orange);
     preparatory::priv::center_lr(title_2_text, "<=|   Rex Alphonse Reventar  |=>", 10, 120, Output_con::Coloration::Orange);
     preparatory::priv::center_lr(title_2_text, "And:", 11, 120, Output_con::Coloration::Orange);
     preparatory::priv::center_lr(title_2_text, "<=|      Brent Cristobal     |=>", 12, 120, Output_con::Coloration::Orange);
-
-    preparatory::priv::printcon(title_2_text);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
-void preparatory::Title::title_screen_3 (
+void preparatory::Title::title_screen_3l (
     std::vector<Output_con>& title_3_subtitle,
     std::vector<Output_con>& title_3_border,
     std::vector<Output_con>& title_3_text
 ) {
     // The subtitle, "current settings"
-    preparatory::priv::center_lr(title_3_subtitle, "Current Settings:", 15, 120, Output_con::Coloration::Green);
-
-    preparatory::priv::printcon(title_3_subtitle);
+    preparatory::priv::center_lr(title_3_subtitle, "Current Settings:", 15, 120);
 
     // The borders, in 2 opposite sweeping fashions
     for (int i = 0; i <= 29; ++i) {
@@ -466,31 +540,133 @@ void preparatory::Title::title_screen_3 (
         title_3_border.push_back(Output_con("~", 19, (54-i), 15, true));
     }
 
+    // The ROYGBIV Part
+    preparatory::priv::center_lr(title_3_text, "No Repeats, Randomized", 17, 500);
+    title_3_text.push_back(Output_con("R", 18, 34, Output_con::Coloration::Red));
+    title_3_text.push_back(Output_con(" ", 18, 35));
+    title_3_text.push_back(Output_con("O", 18, 36, Output_con::Coloration::Orange));
+    title_3_text.push_back(Output_con(" ", 18, 37));
+    title_3_text.push_back(Output_con("Y", 18, 38, Output_con::Coloration::Yellow));
+    title_3_text.push_back(Output_con(" ", 18, 39));
+    title_3_text.push_back(Output_con("G", 18, 40, Output_con::Coloration::Green));
+    title_3_text.push_back(Output_con(" ", 18, 41));
+    title_3_text.push_back(Output_con("B", 18, 42, Output_con::Coloration::Blue));
+    title_3_text.push_back(Output_con(" ", 18, 43));
+    title_3_text.push_back(Output_con("V", 18, 44, Output_con::Coloration::Violet));
+}
+
+void preparatory::Title::title_screen_4l(
+    std::vector<Output_con>& title_4_subtitle,
+    std::vector<Output_con>& title_4_border,
+    std::vector<Output_con>& title_4_text
+) {
+    // The subtitle
+    preparatory::priv::center_lr(
+        title_4_subtitle, 
+        "Press any arrow key, then enter, to make a selection.", 
+        20, 
+        120,
+        Output_con::Coloration::Green
+    );
+
+    // The first column
+    preparatory::priv::scanner(title_4_border, {"┈", "┊", "┈"}, 21, 11, Output_con::Coloration::Red);
+    // The next 2 rows
+    for (int i = 0; i <= 17; ++i) {
+        title_4_border.push_back(Output_con("┈", 21, (12+i), 30, false, Output_con::Coloration::Red));
+        title_4_border.push_back(Output_con("┈", 23, (12+i), 30, true, Output_con::Coloration::Red));
+    }
+    // the next column
+    preparatory::priv::scanner(title_4_border, {"┈", "┊", "┈"}, 21, 29, Output_con::Coloration::Red);
+    // The next rows
+    for (int i = 0; i <= 17; ++i) {
+        title_4_border.push_back(Output_con("┈", 21, (30+i), 30, false, Output_con::Coloration::Red));
+        title_4_border.push_back(Output_con("┈", 23, (30+i), 30, true, Output_con::Coloration::Red));
+    }
+    // the next column
+    preparatory::priv::scanner(title_4_border, {"┈", "┊", "┈"}, 21, 47, Output_con::Coloration::Red);
+    // The next rows
+    for (int i = 0; i <= 17; ++i) {
+        title_4_border.push_back(Output_con("┈", 21, (48+i), 30, false, Output_con::Coloration::Red));
+        title_4_border.push_back(Output_con("┈", 23, (48+i), 30, true, Output_con::Coloration::Red));
+    }
+    // the last column
+    preparatory::priv::scanner(title_4_border, {"┈", "┊", "┈"}, 21, 66, Output_con::Coloration::Red);
+
+    // The words
+    preparatory::priv::passer_lr(title_4_text, "Settings: ", 22, 15, Output_con::Coloration::Green);
+    preparatory::priv::passer_lr(title_4_text, "Help: ", 22, 33, Output_con::Coloration::Green);
+    preparatory::priv::passer_lr(title_4_text, "Play! ", 22, 51, 60, Output_con::Coloration::Green);
+}
+
+// ==> Printing Functions
+
+void preparatory::Title::title_screen_1p(
+    const std::vector<Output_con>& title_1_bord_1, 
+    const std::vector<Output_con>& title_1_bord_2, 
+    const std::vector<Output_con>& title_1_text
+) {
+    preparatory::priv::printcon(title_1_bord_1);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    preparatory::priv::printcon(title_1_bord_2);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    preparatory::priv::printcon(title_1_text);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+void preparatory::Title::title_screen_2p (
+    const std::vector<Output_con>& title_2_border,
+    const std::vector<Output_con>& title_2_text
+) {
+    preparatory::priv::printcon(title_2_border);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    preparatory::priv::printcon(title_2_text);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+void preparatory::Title::title_screen_3p (
+    const std::vector<Output_con>& title_3_subtitle,
+    const std::vector<Output_con>& title_3_border,
+    const std::vector<Output_con>& title_3_text
+) {
+    preparatory::priv::printcon(title_3_subtitle);
+
     preparatory::priv::printcon(title_3_border);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-    preparatory::priv::center_lr(title_3_text, "No Repeats, Randomized", 17, 500);
-    title_3_text.push_back(Output_con("R", 18, 33, Output_con::Coloration::Red));
-    title_3_text.push_back(Output_con(" ", 18, 34));
-    title_3_text.push_back(Output_con("O", 18, 35, Output_con::Coloration::Orange));
-    title_3_text.push_back(Output_con(" ", 18, 36));
-    title_3_text.push_back(Output_con("Y", 18, 37, Output_con::Coloration::Yellow));
-    title_3_text.push_back(Output_con(" ", 18, 38));
-    title_3_text.push_back(Output_con("G", 18, 39, Output_con::Coloration::Green));
-    title_3_text.push_back(Output_con(" ", 18, 40));
-    title_3_text.push_back(Output_con("B", 18, 41, Output_con::Coloration::Blue));
-    title_3_text.push_back(Output_con(" ", 18, 42));
-    title_3_text.push_back(Output_con("V", 18, 43, Output_con::Coloration::Violet));
 
     preparatory::priv::printcon(title_3_text);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
+void preparatory::Title::title_screen_4p(
+    const std::vector<Output_con>& title_4_subtitle,
+    const std::vector<Output_con>& title_4_border,
+    const std::vector<Output_con>& title_4_text
+) {
+    preparatory::priv::printcon(title_4_subtitle);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    preparatory::priv::printcon(title_4_border);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    preparatory::priv::printcon(title_4_text);
+}
+
 // ==> Auxiliary Functions
 
-void preparatory::priv::printcon(std::vector<Output_con>& outputvec) {
+void const preparatory::priv::printcon(const std::vector<Output_con>& outputvec) {
     for (Output_con outputc : outputvec) {
         // Move to the necessary location
         move(outputc.y_dim, outputc.x_dim);
@@ -577,6 +753,59 @@ void preparatory::priv::center_lr(
         std::string s(1, outstr[i]);
         granvec.push_back(Output_con(s, y_dimu, (dis + i), col));
         if (i == len-1) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(lastwait));
+            return;
+        }
+    }
+}
+
+void preparatory::priv::passer_lr(
+    std::vector <Output_con>& granvec, 
+    std::string outstr, 
+    int y_dimu, 
+    int x_dimu, 
+    int lastwait
+) {
+    for (int i = 0; i < outstr.length(); ++i) {
+        std::string s(1, outstr[i]);
+        granvec.push_back(Output_con(s, y_dimu, (x_dimu + i)));
+        if (i == (outstr.length() - 1)) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(lastwait));
+            return;
+        }
+    }
+}
+
+void preparatory::priv::passer_lr(
+    std::vector <Output_con>& granvec, 
+    std::string outstr, 
+    int y_dimu, 
+    int x_dimu, 
+    Output_con::Coloration col
+) {
+    for (int i = 0; i < outstr.length(); ++i) {
+        std::string s(1, outstr[i]);
+        granvec.push_back(Output_con(s, y_dimu, (x_dimu + i), col));
+        
+        if (i == (outstr.length() - 1)) {
+            return;
+        }
+        
+    }
+}
+
+void preparatory::priv::passer_lr(
+    std::vector <Output_con>& granvec, 
+    std::string outstr, 
+    int y_dimu, 
+    int x_dimu, 
+    int lastwait,
+    Output_con::Coloration col
+) {
+    for (int i = 0; i < outstr.length(); ++i) {
+        std::string s(1, outstr[i]);
+        granvec.push_back(Output_con(s, y_dimu, (x_dimu + i), col));
+        if (i == (outstr.length() - 1)) {
             std::this_thread::sleep_for(std::chrono::milliseconds(lastwait));
             return;
         }
