@@ -18,6 +18,11 @@ struct Output_con {
         Blue = 27, 
         Violet = 92
     };
+    // Will contain attribute information
+    enum class Attribute{
+        Naught = 0,
+        Reversed
+    };
     // The character that will be outputted
     std::string output_char;
     // The x-dimension
@@ -30,6 +35,8 @@ struct Output_con {
     bool return_now; 
     // a modifier to make it colored
     Coloration given_color; 
+    // a modifier to give an attribute
+    Attribute given_attr;
     // the color's pair number
     int pair_num;
 
@@ -40,7 +47,8 @@ struct Output_con {
         y_dim(y1), 
         wait_time(30), 
         return_now(true),
-        given_color(Coloration::Naught) { 
+        given_color(Coloration::Naught),
+        given_attr(Attribute::Naught) { 
             pair_num = 1;
         }
     // Constructor for Output_con given all except mod
@@ -50,7 +58,8 @@ struct Output_con {
         y_dim(y1),
         wait_time(wait),
         return_now(return_n),
-        given_color(Coloration::Naught) { 
+        given_color(Coloration::Naught),
+        given_attr(Attribute::Naught) { 
             pair_num = 1;
         }
     // Constructor for Output_con given all
@@ -60,7 +69,19 @@ struct Output_con {
         y_dim(y1),
         wait_time(wait),
         return_now(return_n),
-        given_color(mod) {
+        given_color(mod),
+        given_attr(Attribute::Naught){
+            pair_num = color_table(mod);
+        }
+    // Constructor for Output_con given all
+    Output_con(std::string str, int y1, int x1, int wait, bool return_n, Coloration mod, Attribute attr) :
+        output_char(str),
+        x_dim(x1),
+        y_dim(y1),
+        wait_time(wait),
+        return_now(return_n),
+        given_color(mod),
+        given_attr(attr){
             pair_num = color_table(mod);
         }
     // Constructor given just a color
@@ -70,7 +91,8 @@ struct Output_con {
         y_dim(y1),
         wait_time(30),
         return_now(true),
-        given_color(mod) {
+        given_color(mod),
+        given_attr(Attribute::Naught) {
             pair_num = color_table(mod);
         }
     // Look for colors
@@ -152,15 +174,13 @@ namespace preparatory {
             // Loads the menu.
             void title_screen_4l(
                 std::vector<Output_con>& title_4_subtitle,
-                std::vector<Output_con>& title_4_border,
-                std::vector<Output_con>& title_4_text
+                std::vector<Output_con>& title_4_border
             );
 
             // Prints the menu.
             void title_screen_4p(
                 const std::vector<Output_con>& title_4_subtitle,
-                const std::vector<Output_con>& title_4_border,
-                const std::vector<Output_con>& title_4_text
+                const std::vector<Output_con>& title_4_border
             );
         private:
             // The vector that will contain the borders and text of the title.
@@ -181,6 +201,16 @@ namespace preparatory {
             std::vector<Output_con> title_4_subtitle {};
             std::vector<Output_con> title_4_border {};
             std::vector<Output_con> title_4_text {};
+
+            // The enum class that will state which of the title states is correct.
+            enum class Title_state {
+                Settings,
+                Help,
+                Play
+            };
+
+            // print out the title state
+            void choice_printer(Title::Title_state given_choice, std::vector<Output_con>& granvec);
     };
 
     // Prints the help screen and accepts the inputs given to it.
@@ -225,6 +255,7 @@ namespace preparatory {
         );
 
         // Pass a string, horizontal, and it's positions.
+        // For documentation processes.
         void passer_lr(
             std::vector <Output_con>& granvec, 
             std::string outstr, 
@@ -233,28 +264,20 @@ namespace preparatory {
             int lastwait
         );
 
-        // Pass a string, horizontal, its positions, and the prefered color.
+        // Pass a string, horizontal, its positions, and the prefered color, and more.
         void passer_lr(
             std::vector <Output_con>& granvec,
             std::string outstr, 
             int y_dimu, 
             int x_dimu, 
-            Output_con::Coloration col
-        );
-
-        // Pass a string, horizontal, its positions, the last wait, and the prefered color.
-        void passer_lr(
-            std::vector <Output_con>& granvec,
-            std::string outstr, 
-            int y_dimu, 
-            int x_dimu, 
-            int lastwait,
-            Output_con::Coloration col
+            Output_con::Coloration col,
+            Output_con::Attribute attri,
+            bool will_return
         );
     }
 }
 
-// ==> Definitions
+// ==> Grand Definitions
 
 void preparatory::startup() {
     // before NCURSES is called
@@ -269,7 +292,7 @@ void preparatory::startup() {
         keep_window_open_cont();
     }
     */
-    //call NCURSES
+    // call NCURSES
     setlocale(LC_ALL, "");
     initscr();
     
@@ -283,13 +306,25 @@ void preparatory::startup() {
         error("Your terminal does not support colors.");
     }
     
+    // Start colors
     start_color();
-    //use_default_colors();
+
+    // Make screen white on black
     wbkgd(stdscr, COLOR_PAIR(1));
+
+    // get all characters
+    cbreak();
+
+    // ensure that the escape characters don't get printed
+    noecho();
+
+    // let's get our arrow keys
+    keypad(stdscr, true);
 
     // prepare the game title
     preparatory::Title Game_Title;
     Game_Title.preparatory::Title::title_screen();
+
     refresh();
     getch();
     endwin();
@@ -297,8 +332,7 @@ void preparatory::startup() {
 
 void preparatory::Title::title_screen() {
 
-    // wait for 1 second before beginning the run
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    curs_set(0);
     
     // The title itself
     preparatory::Title::title_screen_1l(
@@ -341,19 +375,65 @@ void preparatory::Title::title_screen() {
     // The switching option
     preparatory::Title::title_screen_4l(
         preparatory::Title::title_4_subtitle,
-        preparatory::Title::title_4_border,
-        preparatory::Title::title_4_text
+        preparatory::Title::title_4_border
     );
 
     preparatory::Title::title_screen_4p(
         preparatory::Title::title_4_subtitle,
-        preparatory::Title::title_4_border,
-        preparatory::Title::title_4_text
+        preparatory::Title::title_4_border
     );
+
+    // state the default choice
+    preparatory::Title::Title_state given_choice = preparatory::Title::Title_state::Play;
+
+    // print out title_state the first time, with default choice
+    preparatory::Title::choice_printer(given_choice, preparatory::Title::title_4_text);
+
+    // int that will contain the input? I have no clue, but that's how it works, I guess.
+    int given_switcher = 0;
+
+    // bool that will state whether to get out of the loop and go to another screen
+    bool got_in = false;
+
+    while(!got_in) {
+        // get the person's choice
+        given_switcher = getch();
+
+        switch(given_switcher) {
+            // if the user entered left
+            case KEY_LEFT:
+                // switch each value to the one on the left
+                if (given_choice == preparatory::Title::Title_state::Play) {
+                    given_choice = preparatory::Title::Title_state::Help;
+                } else if (given_choice == preparatory::Title::Title_state::Help) {
+                    given_choice = preparatory::Title::Title_state::Settings;
+                } else if (given_choice == preparatory::Title::Title_state::Settings) {
+                    given_choice = preparatory::Title::Title_state::Play;
+                }
+                // make out the change
+                preparatory::Title::choice_printer(given_choice, preparatory::Title::title_4_text);
+                break;
+            case KEY_RIGHT:
+                // switch each value to the one on the right
+                if (given_choice == preparatory::Title::Title_state::Play) {
+                    given_choice = preparatory::Title::Title_state::Settings;
+                } else if (given_choice == preparatory::Title::Title_state::Help) {
+                    given_choice = preparatory::Title::Title_state::Play;
+                } else if (given_choice == preparatory::Title::Title_state::Settings) {
+                    given_choice = preparatory::Title::Title_state::Help;
+                }
+                // make out the change
+                preparatory::Title::choice_printer(given_choice, preparatory::Title::title_4_text);
+                break;
+            case 10: // char(10) is the return, or endl
+                got_in = true;
+        }
+    }
 
     // Move on to next part of screen
 	refresh();
 	getch();
+    curs_set(1);
 }
 
 // ==> Loaders
@@ -557,8 +637,7 @@ void preparatory::Title::title_screen_3l (
 
 void preparatory::Title::title_screen_4l(
     std::vector<Output_con>& title_4_subtitle,
-    std::vector<Output_con>& title_4_border,
-    std::vector<Output_con>& title_4_text
+    std::vector<Output_con>& title_4_border
 ) {
     // The subtitle
     preparatory::priv::center_lr(
@@ -592,11 +671,12 @@ void preparatory::Title::title_screen_4l(
     }
     // the last column
     preparatory::priv::scanner(title_4_border, {"┈", "┊", "┈"}, 21, 66, Output_con::Coloration::Red);
-
+    /*
     // The words
     preparatory::priv::passer_lr(title_4_text, "Settings: ", 22, 15, Output_con::Coloration::Green);
     preparatory::priv::passer_lr(title_4_text, "Help: ", 22, 33, Output_con::Coloration::Green);
     preparatory::priv::passer_lr(title_4_text, "Play! ", 22, 51, 60, Output_con::Coloration::Green);
+    */
 }
 
 // ==> Printing Functions
@@ -650,8 +730,7 @@ void preparatory::Title::title_screen_3p (
 
 void preparatory::Title::title_screen_4p(
     const std::vector<Output_con>& title_4_subtitle,
-    const std::vector<Output_con>& title_4_border,
-    const std::vector<Output_con>& title_4_text
+    const std::vector<Output_con>& title_4_border
 ) {
     preparatory::priv::printcon(title_4_subtitle);
 
@@ -660,8 +739,106 @@ void preparatory::Title::title_screen_4p(
     preparatory::priv::printcon(title_4_border);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
+    /*
     preparatory::priv::printcon(title_4_text);
+    */
+}
+
+void preparatory::Title::choice_printer(
+    Title::Title_state given_choice,
+    std::vector<Output_con>& granvec
+) {
+    if (given_choice == preparatory::Title::Title_state::Settings) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Settings:",
+            22,
+            16,
+            Output_con::Coloration::Green,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Help:",
+            22,
+            36,
+            Output_con::Coloration::Green,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Game!",
+            22,
+            54,
+            Output_con::Coloration::Green,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::printcon(granvec);
+        granvec.clear();
+    } else if (given_choice == preparatory::Title::Title_state::Help) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Settings:",
+            22,
+            16,
+            Output_con::Coloration::Green,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Help:",
+            22,
+            36,
+            Output_con::Coloration::Green,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Game!",
+            22,
+            54,
+            Output_con::Coloration::Green,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::printcon(granvec);
+        granvec.clear();
+    } else if (given_choice == preparatory::Title::Title_state::Play) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Settings:",
+            22,
+            16,
+            Output_con::Coloration::Green,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Help:",
+            22,
+            36,
+            Output_con::Coloration::Green,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Game!",
+            22,
+            54,
+            Output_con::Coloration::Green,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::printcon(granvec);
+        granvec.clear();
+    }
 }
 
 // ==> Auxiliary Functions
@@ -672,9 +849,16 @@ void const preparatory::priv::printcon(const std::vector<Output_con>& outputvec)
         move(outputc.y_dim, outputc.x_dim);
         
         init_pair(outputc.pair_num, static_cast<int>(outputc.given_color), 0);
-        attron(COLOR_PAIR(outputc.pair_num));
-        printw(outputc.output_char.c_str());
-        attroff(COLOR_PAIR(outputc.pair_num));
+
+        if (outputc.given_attr == Output_con::Attribute::Naught) {
+            attron(COLOR_PAIR(outputc.pair_num));
+            printw(outputc.output_char.c_str());
+            attroff(COLOR_PAIR(outputc.pair_num));
+        } else if (outputc.given_attr == Output_con::Attribute::Reversed) {
+            attron(COLOR_PAIR(outputc.pair_num) | A_REVERSE);
+            printw(outputc.output_char.c_str());
+            attroff(COLOR_PAIR(outputc.pair_num) | A_REVERSE);
+        }
 
         // If we need to return, return
         if (outputc.return_now == true) {
@@ -781,33 +965,26 @@ void preparatory::priv::passer_lr(
     std::string outstr, 
     int y_dimu, 
     int x_dimu, 
-    Output_con::Coloration col
+    Output_con::Coloration col,
+    Output_con::Attribute attri,
+    bool will_return
 ) {
-    for (int i = 0; i < outstr.length(); ++i) {
-        std::string s(1, outstr[i]);
-        granvec.push_back(Output_con(s, y_dimu, (x_dimu + i), col));
-        
-        if (i == (outstr.length() - 1)) {
-            return;
+    if (will_return == true) {
+        for (int i = 0; i < outstr.length(); ++i) {
+            std::string s(1, outstr[i]);
+            granvec.push_back(Output_con(s, y_dimu, (x_dimu + i), 30, true, col, attri));
+            if (i == (outstr.length() - 1)) {
+                return;
+            }
         }
-        
-    }
-}
-
-void preparatory::priv::passer_lr(
-    std::vector <Output_con>& granvec, 
-    std::string outstr, 
-    int y_dimu, 
-    int x_dimu, 
-    int lastwait,
-    Output_con::Coloration col
-) {
-    for (int i = 0; i < outstr.length(); ++i) {
-        std::string s(1, outstr[i]);
-        granvec.push_back(Output_con(s, y_dimu, (x_dimu + i), col));
-        if (i == (outstr.length() - 1)) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(lastwait));
-            return;
+    } else if (will_return == false){
+        for (int i = 0; i < outstr.length(); ++i) {
+            std::string s(1, outstr[i]);
+            if (i == (outstr.length() - 1)) {
+                granvec.push_back(Output_con(s, y_dimu, (x_dimu + i), 0, true, col, attri));
+                return;
+            }
+            granvec.push_back(Output_con(s, y_dimu, (x_dimu + i), 0, false, col, attri));
         }
     }
 }
