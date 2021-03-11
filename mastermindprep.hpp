@@ -15,6 +15,15 @@ struct FC_info {
 
     // The initialization of the enum class:
     Coloration given_color = Coloration::Naught;
+
+    // TODO: Add boldness information
+
+    // Constructor with 1 color?
+    FC_info(Coloration col) :
+        given_color(col) {}
+    // Constructor with nothing?
+    FC_info() :
+        given_color(Coloration::Naught) {}
 };
 
 // The structure that will contain the outputted things.
@@ -79,10 +88,17 @@ namespace preparatory {
             );
 
             // Prints the creators.
-            void title_screen_2();
+            void title_screen_2(
+                std::vector<Output_con>& title_2_border,
+                std::vector<Output_con>& title_2_text
+            );
 
             // Prints the current settings.
-            void title_screen_3();
+            void title_screen_3(
+                std::vector<Output_con>& title_3_subtitle,
+                std::vector<Output_con>& title_3_border,
+                std::vector<Output_con>& title_3_text
+            );
 
             // Prints the menu.
             void title_screen_4();
@@ -93,7 +109,7 @@ namespace preparatory {
             std::vector<Output_con> title_1_text {};
 
             // The vectors that will contain the creators.
-            std::vector<Output_con> title_2_bord_1 {};
+            std::vector<Output_con> title_2_border {};
             std::vector<Output_con> title_2_text {};
 
             // The vectors that will contain the current settings.
@@ -115,16 +131,22 @@ namespace preparatory {
     namespace priv {
         int terminal_x = -1, terminal_y = -1;
 
+        // The required termwidth.
+        const int termwidth = 80;
+
         // Output the outputcons correctly
         void printcon(std::vector<Output_con>& outputvec);
 
         // Pass a vector of Output_cons to printcon.
         // Meant to help with sweeping function.
         void scanner(std::vector <Output_con>& granvec, std::vector <std::string> vecstr, int y_dimu, int x_dimu);
+
+        void center_lr(std::vector <Output_con>& granvec, std::string outstr, int y_dimu, int lastwait);
     }
     
 }
 
+// ==> Definitions
 
 void preparatory::startup() {
     // before NCURSES is called
@@ -146,7 +168,7 @@ void preparatory::startup() {
     // confirm that the screen is, in fact, at least 80 pixels wide
     getmaxyx(stdscr, preparatory::priv::terminal_y, preparatory::priv::terminal_x);
     // call error if not
-    if (preparatory::priv::terminal_x < 80) {
+    if (preparatory::priv::terminal_x < preparatory::priv::termwidth) {
         error("Your screen is not wide enough to play this game.");
     }
     if (has_colors() == false) {
@@ -174,18 +196,31 @@ void preparatory::Title::title_screen() {
     }
 
     // Define color pairs
-    init_pair(1, COLOR_RED, use_default_colors());
-    init_pair(2, COLOR_BLACK, use_default_colors()); // Orange
-    init_pair(3, COLOR_YELLOW, use_default_colors());
-    init_pair(4, COLOR_GREEN, use_default_colors());
-    init_pair(5, COLOR_BLUE, use_default_colors());
-    init_pair(6, COLOR_MAGENTA, use_default_colors());
+    init_pair(0, COLOR_BLACK, COLOR_WHITE);
+    init_pair(1, COLOR_RED, COLOR_WHITE);
+    init_pair(2, COLOR_BLACK, COLOR_WHITE); // Orange
+    init_pair(3, COLOR_YELLOW, COLOR_WHITE);
+    init_pair(4, COLOR_GREEN, COLOR_WHITE);
+    init_pair(5, COLOR_BLUE, COLOR_WHITE);
+    init_pair(6, COLOR_MAGENTA, COLOR_WHITE);
 
     // The title itself
     preparatory::Title::title_screen_1(
         preparatory::Title::title_1_bord_1,
         preparatory::Title::title_1_bord_2,
         preparatory::Title::title_1_text
+    );
+
+    // The creator boxes
+    preparatory::Title::title_screen_2(
+        preparatory::Title::title_2_border,
+        preparatory::Title::title_2_text
+    );
+
+    preparatory::Title::title_screen_3(
+        preparatory::Title::title_3_subtitle,
+        preparatory::Title::title_3_border,
+        preparatory::Title::title_3_text
     );
 
     // Move on to next part of screen
@@ -227,7 +262,7 @@ void preparatory::Title::title_screen_1(
     // Top Right Corner
     title_1_bord_1.push_back(Output_con("┓", 0, 79));
     // Top side
-    for (int i = 78; i > 1; --i) {
+    for (int i = 78; i >= 1; --i) {
         title_1_bord_1.push_back(Output_con("━", 0, i));
     }
 
@@ -336,6 +371,77 @@ void preparatory::Title::title_screen_1(
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
+void preparatory::Title::title_screen_2(
+    std::vector<Output_con>& title_2_border,
+    std::vector<Output_con>& title_2_text
+) {
+    // Top side, border
+    for (int i = 0; i <= 19; ++i) {
+        title_2_border.push_back(Output_con("═", 8, (39 + i), 30, false));
+        title_2_border.push_back(Output_con("═", 8, (39 - i), 30, true));
+    }
+    // Top corners, border
+    title_2_border.push_back(Output_con("╔", 8, 19, 30, false));
+    title_2_border.push_back(Output_con("╗", 8, 59, 30, true));
+    // Sides, border
+    // Will try a 60 millisecond delay– will that work better?
+    for (int i = 0; i <= 3; ++i) {
+        title_2_border.push_back(Output_con("║", (9 + i), 19, 60, false));
+        title_2_border.push_back(Output_con("║", (9 + i), 59, 60, true));
+    }
+    // Bottom corners, border
+    title_2_border.push_back(Output_con("╚", 13, 19, 30, false));
+    title_2_border.push_back(Output_con("╝", 13, 59, 30, true));
+    // Bottom side, border
+    for (int i = 19; i >= 0; --i) {
+        title_2_border.push_back(Output_con("═", 13, (39 + i), 30, false));
+        title_2_border.push_back(Output_con("═", 13, (39 - i), 30, true));
+    }
+
+    preparatory::priv::printcon(title_2_border);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    preparatory::priv::center_lr(title_2_text, "By:", 9, 120);
+    preparatory::priv::center_lr(title_2_text, "<=|   Rex Alphonse Reventar  |=>", 10, 120);
+    preparatory::priv::center_lr(title_2_text, "And:", 11, 120);
+    preparatory::priv::center_lr(title_2_text, "<=|      Brent Cristobal     |=>", 12, 120);
+
+    preparatory::priv::printcon(title_2_text);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+void preparatory::Title::title_screen_3 (
+    std::vector<Output_con>& title_3_subtitle,
+    std::vector<Output_con>& title_3_border,
+    std::vector<Output_con>& title_3_text
+) {
+    // The subtitle, "current settings"
+    preparatory::priv::center_lr(title_3_subtitle, "Current Settings:", 15, 120);
+
+    preparatory::priv::printcon(title_3_subtitle);
+
+    // The borders, in 2 opposite sweeping fashions
+    for (int i = 0; i <= 29; ++i) {
+        title_3_border.push_back(Output_con("~", 16, (25+i), 15, false));
+        title_3_border.push_back(Output_con("~", 19, (54-i), 15, true));
+    }
+
+    preparatory::priv::printcon(title_3_border);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    preparatory::priv::center_lr(title_3_text, "No Repeats, Randomized", 17, 500);
+    title_3_text.push_back(Output_con("R", 18, 33, 30, true, FC_info(FC_info::Coloration::Red)));
+
+    preparatory::priv::printcon(title_3_text);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+}
+
+// ==> Auxiliary Functions
+
 void preparatory::priv::printcon(std::vector<Output_con>& outputvec) {
     for (Output_con outputc : outputvec) {
         // Move to the necessary location
@@ -373,6 +479,25 @@ void preparatory::priv::scanner(
             granvec.push_back(Output_con(vecstr[i], (y_dimu + i), x_dimu, round(30.0/vecstr.size()), false));
         } else if (i == (vecstr.size()-1)) {
             granvec.push_back(Output_con(vecstr[i], (y_dimu + i), x_dimu, round(30.0/vecstr.size()), true));
+            return;
+        }
+    }
+}
+
+void preparatory::priv::center_lr(
+    std::vector <Output_con>& granvec, 
+    std::string outstr, 
+    int y_dimu,
+    int lastwait
+) {
+    int len = outstr.length();
+    // Distance from side
+    int dis = 39 - static_cast<int>(floor(len/2.0));
+    for (int i = 0; i < len; ++i) {
+        std::string s(1, outstr[i]);
+        granvec.push_back(Output_con(s, y_dimu, (dis + i)));
+        if (i == len-1) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(lastwait));
             return;
         }
     }
