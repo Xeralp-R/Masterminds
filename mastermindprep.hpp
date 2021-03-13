@@ -259,7 +259,8 @@ namespace preparatory {
             // prints the title portion in its own window
             void help_screen_1p(
                 const std::vector<Output_con>& help_1_border,
-                const std::vector<Output_con>& help_1_text
+                const std::vector<Output_con>& help_1_text,
+                WINDOW * given_win
             );
 
             // load the menu border
@@ -269,7 +270,8 @@ namespace preparatory {
 
             // print the menu border
             void help_screen_2p(
-                const std::vector<Output_con>& help_2_border
+                const std::vector<Output_con>& help_2_border,
+                WINDOW * given_win
             );
 
             // vectors that will containt the title stuff
@@ -291,6 +293,9 @@ namespace preparatory {
 
         // Output the outputcons correctly
         void const printcon (const std::vector<Output_con>& outputvec);
+
+        // Output the outputcons to a window
+        void const wprintcon (WINDOW * given_win, const std::vector<Output_con>& outputvec);
 
         // Pass a vertical vector of Output_cons to printcon.
         // Meant to help with sweeping function.
@@ -422,11 +427,11 @@ void preparatory::startup() {
             game_passant = true;
             //break;
         }
-        if (!game_passant) {
+        if (game_passant == false) {
             // clear the standard screen
             wclear(stdscr);
             // print the title screen again
-            preparatory::Title::Title_state titular_state = Game_Title.preparatory::Title::title_screen_print();
+            titular_state = Game_Title.preparatory::Title::title_screen_print();
         }
     }
 
@@ -541,6 +546,7 @@ preparatory::Title::Title_state preparatory::Title::title_screen_print() {
                 break;
             case 10: // char(10) is the return, or endl
                 got_in = true;
+                break;
         }
     }
 
@@ -952,16 +958,53 @@ void preparatory::Title::choice_printer(
 void preparatory::Help::help_screen_load() {
     // load the top of the help screen:
     help_screen_1l(help_1_border, help_1_text);
+
+    // load the subtitles and choices and stuff
+    help_screen_2l(help_2_border);
 }
 
 void preparatory::Help::help_screen_inter() {
+    // clear the rest of the screen
+    wclear(stdscr);
 
+    // create the window for the top
+    //! Possible location for bugs!
+    WINDOW * Help_Titular;
+    Help_Titular = newwin(7, 80, 0, 0);
+
+    WINDOW * Help_Primary;
+    Help_Primary = newwin(17, 80, 7, 0);
+
+    // Make screen white on black
+    // wbkgd(stdscr, COLOR_PAIR(1));
+
+    // print out the help screen
+    help_screen_1p(
+        preparatory::Help::help_1_border, 
+        preparatory::Help::help_1_text, 
+        Help_Titular
+    );
+
+    help_screen_2p(
+        preparatory::Help::help_2_border,
+        Help_Primary
+    );
+
+    curs_set(1);
+
+    wgetch(Help_Primary);
+
+    curs_set(0);
+
+    delwin(Help_Titular);
+    delwin(Help_Primary);
 }
 
 void preparatory::Help::help_screen_clear() {
     // clear top title, to be fixed
     preparatory::Help::help_1_border.clear();
     preparatory::Help::help_1_text.clear();
+    preparatory::Help::help_2_border.clear();
 }
 
 // ==> Help Loader Functions
@@ -972,18 +1015,18 @@ void preparatory::Help::help_screen_1l (
 ) {
     // load the border
     // left side of outer, right side inner
-    help_1_border.push_back(Output_con("┃", 3, 0, 120, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("*", 3, 77, 120, true, Output_con::Coloration::Naught));
-    help_1_border.push_back(Output_con("┃", 2, 0, 60, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("┃", 4, 0, 60, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("*", 2, 77, 60, false, Output_con::Coloration::Naught));
-    help_1_border.push_back(Output_con("*", 4, 77, 60, true, Output_con::Coloration::Naught));
-    help_1_border.push_back(Output_con("┃", 1, 0, 60, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("┃", 5, 0, 60, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("*", 1, 77, 60, false, Output_con::Coloration::Naught));
-    help_1_border.push_back(Output_con("*", 5, 77, 60, true, Output_con::Coloration::Naught));
-    help_1_border.push_back(Output_con("┏", 0, 0, 120, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("┗", 6, 0, 120, true, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 3, 0, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 3, 77, 60, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┃", 2, 0, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 4, 0, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 2, 77, 30, false, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("*", 4, 77, 30, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┃", 1, 0, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 5, 0, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 1, 77, 30, false, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("*", 5, 77, 30, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┏", 0, 0, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┗", 6, 0, 60, true, Output_con::Coloration::Red));
     // the tops and bottoms
     help_1_border.push_back(Output_con("━", 0, 1, 30, false, Output_con::Coloration::Red));
     help_1_border.push_back(Output_con("━", 6, 1, 30, true, Output_con::Coloration::Red));
@@ -1004,18 +1047,18 @@ void preparatory::Help::help_screen_1l (
     help_1_border.push_back(Output_con("━", 0, 78, 30, false, Output_con::Coloration::Red));
     help_1_border.push_back(Output_con("━", 6, 78, 30, true, Output_con::Coloration::Red));
     // right side of outer, left side of inner
-    help_1_border.push_back(Output_con("┓", 0, 79, 120, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("┛", 6, 79, 120, true, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("┃", 1, 79, 60, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("┃", 5, 79, 60, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("*", 1, 2, 60, false, Output_con::Coloration::Naught));
-    help_1_border.push_back(Output_con("*", 5, 2, 60, true, Output_con::Coloration::Naught));
-    help_1_border.push_back(Output_con("┃", 2, 79, 60, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("┃", 4, 79, 60, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("*", 2, 2, 60, false, Output_con::Coloration::Naught));
-    help_1_border.push_back(Output_con("*", 4, 2, 60, true, Output_con::Coloration::Naught));
-    help_1_border.push_back(Output_con("┃", 3, 79, 120, false, Output_con::Coloration::Red));
-    help_1_border.push_back(Output_con("*", 3, 2, 120, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┓", 0, 79, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┛", 6, 79, 60, true, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 1, 79, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 5, 79, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 1, 2, 30, false, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("*", 5, 2, 30, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┃", 2, 79, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 4, 79, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 2, 2, 30, false, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("*", 4, 2, 30, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┃", 3, 79, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 3, 2, 60, true, Output_con::Coloration::Naught));
 
     // Load the text
     // H
@@ -1049,11 +1092,63 @@ void preparatory::Help::help_screen_1l (
     preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 52, Output_con::Coloration::Red);
 }
 
+void preparatory::Help::help_screen_2l(
+    std::vector<Output_con>& help_2_border
+) {
+    // load the subtitle
+    preparatory::priv::center_lr(
+        help_2_border, 
+        "What do you need help about?", 
+        1, 
+        60, 
+        Output_con::Coloration::Orange
+    );
+    preparatory::priv::center_lr(
+        help_2_border, 
+        "Press the arrow key, then enter, to make a selection.", 
+        2, 
+        60, 
+        Output_con::Coloration::Orange
+    );
+    // load the border
+    /*
+    preparatory::priv::center_lr(
+        help_2_border, 
+        "╔══════════════════════════════════════╗", 
+        4, 
+        60, 
+        Output_con::Coloration::Purple
+    );
+    */
+    help_2_border.push_back(Output_con("╔", 4, 20, 30, false, Output_con::Coloration::Violet));
+    help_2_border.push_back(Output_con("╝", 11, 59, 30, true, Output_con::Coloration::Violet));
+    for (int i = 0; i <= 37; ++i) {
+        help_2_border.push_back(Output_con("═", 4, (21+i), 30, false, Output_con::Coloration::Violet));
+        help_2_border.push_back(Output_con("═", 11, (58-i), 30, true, Output_con::Coloration::Violet));
+    }
+    help_2_border.push_back(Output_con("╗", 4, 59, 30, false, Output_con::Coloration::Violet));
+    help_2_border.push_back(Output_con("╚", 11, 20, 30, true, Output_con::Coloration::Violet));
+}
+
+// ==> Help Printer Functions
+
 void preparatory::Help::help_screen_1p(
     const std::vector<Output_con>& help_1_border,
-    const std::vector<Output_con>& help_1_text
+    const std::vector<Output_con>& help_1_text,
+    WINDOW * given_win
 ){
-    
+    preparatory::priv::wprintcon(given_win, help_1_border);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    preparatory::priv::wprintcon(given_win, help_1_text);
+}
+
+void preparatory::Help::help_screen_2p(
+    const std::vector<Output_con>& help_2_border,
+    WINDOW * given_win
+) {
+    preparatory::priv::wprintcon(given_win, help_2_border);
 }
 
 // ==> Auxiliary Functions
@@ -1078,6 +1173,33 @@ void const preparatory::priv::printcon(const std::vector<Output_con>& outputvec)
         // If we need to return, return
         if (outputc.return_now == true) {
             refresh();
+        }
+
+        // Wait for the given time in milliseconds
+        std::this_thread::sleep_for(std::chrono::milliseconds(outputc.wait_time));
+    }
+}
+
+void const preparatory::priv::wprintcon (WINDOW* given_win, const std::vector<Output_con>& outputvec) {
+    for (Output_con outputc : outputvec) {
+        // Move to the necessary location
+        wmove(given_win, outputc.y_dim, outputc.x_dim);
+        
+        init_pair(outputc.pair_num, static_cast<int>(outputc.given_color), 0);
+
+        if (outputc.given_attr == Output_con::Attribute::Naught) {
+            wattron(given_win, COLOR_PAIR(outputc.pair_num));
+            wprintw(given_win, outputc.output_char.c_str());
+            wattroff(given_win, COLOR_PAIR(outputc.pair_num));
+        } else if (outputc.given_attr == Output_con::Attribute::Reversed) {
+            wattron(given_win, COLOR_PAIR(outputc.pair_num) | A_REVERSE);
+            wprintw(given_win, outputc.output_char.c_str());
+            wattroff(given_win, COLOR_PAIR(outputc.pair_num) | A_REVERSE);
+        }
+
+        // If we need to return, return
+        if (outputc.return_now == true) {
+            wrefresh(given_win);
         }
 
         // Wait for the given time in milliseconds
