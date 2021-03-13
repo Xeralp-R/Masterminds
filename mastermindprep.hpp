@@ -118,6 +118,9 @@ struct Output_con {
     }
 };
 
+// The vector that will contain all of the valid inputs.
+std::vector<std::string> valid_tokens = {"R", "O", "Y", "G", "B", "V"};
+
 // The namespace that will contain all of the preparatory functions.
 namespace preparatory {
     // The general, overarching preparatory function.
@@ -128,8 +131,18 @@ namespace preparatory {
             // Constructor.
             //Title();
 
+            // The enum class that will state which of the title states is correct.
+            enum class Title_state {
+                Settings,
+                Help,
+                Play
+            };
+
+            // Load the input screen
+            void title_screen_load();
+
             // Prints the title screen and accept the inputs given to it.
-            void title_screen();
+            preparatory::Title::Title_state title_screen_print();
 
             // Loads the title itself.
             void title_screen_1l(
@@ -202,19 +215,71 @@ namespace preparatory {
             std::vector<Output_con> title_4_border {};
             std::vector<Output_con> title_4_text {};
 
-            // The enum class that will state which of the title states is correct.
-            enum class Title_state {
-                Settings,
-                Help,
-                Play
-            };
-
             // print out the title state
             void choice_printer(Title::Title_state given_choice, std::vector<Output_con>& granvec);
     };
 
     // Prints the help screen and accepts the inputs given to it.
     void help_screen();
+
+    class Help {
+        public:
+            // Constructor?
+            // Help();
+
+            // The enum class that will contain the choice of help
+            enum class Help_state {
+                // The first page of the explainer
+                Explain_1,
+                // The second page of the explainer
+                Explain_2,
+                // Explain how to play this implementation
+                Refresh,
+                // Back to the help screen
+                Help_screen,
+                // Back to the title screen
+                Title_screen
+            };
+
+            // Load the help screen unpon instantiating
+            void help_screen_load();
+
+            // the interface for the player when interacting with the help screen
+            void help_screen_inter();
+
+            // a "destructor"– clear out all the variables
+            void help_screen_clear();
+        private:
+            // loads the title portion
+            void help_screen_1l(
+                std::vector<Output_con>& help_1_border,
+                std::vector<Output_con>& help_1_text
+            );
+
+            // prints the title portion in its own window
+            void help_screen_1p(
+                const std::vector<Output_con>& help_1_border,
+                const std::vector<Output_con>& help_1_text
+            );
+
+            // load the menu border
+            void help_screen_2l(
+                std::vector<Output_con>& help_2_border
+            );
+
+            // print the menu border
+            void help_screen_2p(
+                const std::vector<Output_con>& help_2_border
+            );
+
+            // vectors that will containt the title stuff
+            std::vector<Output_con> help_1_border {};
+            std::vector<Output_con> help_1_text {};
+
+            // vectors that will contain the main menu
+            std::vector<Output_con> help_2_border {};
+            std::vector<Output_con> help_2_text {};
+    };
 
     // All of the private data that needs to be kept away from mastermind.
     // Primarily helper functions and other such things.
@@ -274,6 +339,13 @@ namespace preparatory {
             Output_con::Attribute attri,
             bool will_return
         );
+
+        // Load in the valid tokens with the correct colors
+        void valid_color_loader(
+            std::vector <Output_con>& granvec,
+            const std::vector<std::string>& valid_tokens,
+            int y_dimu
+        );
     }
 }
 
@@ -323,17 +395,50 @@ void preparatory::startup() {
 
     // prepare the game title
     preparatory::Title Game_Title;
-    Game_Title.preparatory::Title::title_screen();
+
+    // load the title creen
+    Game_Title.preparatory::Title::title_screen_load();
+    // print the title screen
+    preparatory::Title::Title_state titular_state = Game_Title.preparatory::Title::title_screen_print();
+
+    bool game_passant = false;
+
+    while (!game_passant) {
+        if (titular_state == preparatory::Title::Title_state::Help) {
+            // prepare the help screen
+            preparatory::Help Game_Help;
+
+            // load the help screen
+            Game_Help.preparatory::Help::help_screen_load();
+
+            // interface with the help screen
+            Game_Help.preparatory::Help::help_screen_inter();
+
+            // destroy all variables in preparation for another run
+            Game_Help.preparatory::Help::help_screen_clear();
+        } else if (titular_state == preparatory::Title::Title_state::Settings) {
+            // The settings screen
+        } else if (titular_state == preparatory::Title::Title_state::Play) {
+            game_passant = true;
+            //break;
+        }
+        if (!game_passant) {
+            // clear the standard screen
+            wclear(stdscr);
+            // print the title screen again
+            preparatory::Title::Title_state titular_state = Game_Title.preparatory::Title::title_screen_print();
+        }
+    }
 
     refresh();
+    curs_set(1);
     getch();
     endwin();
 }
 
-void preparatory::Title::title_screen() {
+// ==> Title Functions
 
-    curs_set(0);
-    
+void preparatory::Title::title_screen_load() {
     // The title itself
     preparatory::Title::title_screen_1l(
         preparatory::Title::title_1_bord_1,
@@ -341,19 +446,8 @@ void preparatory::Title::title_screen() {
         preparatory::Title::title_1_text
     );
 
-    preparatory::Title::title_screen_1p(
-        preparatory::Title::title_1_bord_1,
-        preparatory::Title::title_1_bord_2,
-        preparatory::Title::title_1_text
-    );
-
     // The creator boxes
     preparatory::Title::title_screen_2l(
-        preparatory::Title::title_2_border,
-        preparatory::Title::title_2_text
-    );
-
-    preparatory::Title::title_screen_2p(
         preparatory::Title::title_2_border,
         preparatory::Title::title_2_text
     );
@@ -366,6 +460,31 @@ void preparatory::Title::title_screen() {
         preparatory::Title::title_3_text
     );
 
+    // The switching option
+    preparatory::Title::title_screen_4l(
+        preparatory::Title::title_4_subtitle,
+        preparatory::Title::title_4_border
+    );
+}
+
+preparatory::Title::Title_state preparatory::Title::title_screen_print() {
+
+    curs_set(0);
+    
+    // The title itself
+    preparatory::Title::title_screen_1p(
+        preparatory::Title::title_1_bord_1,
+        preparatory::Title::title_1_bord_2,
+        preparatory::Title::title_1_text
+    );
+
+    // The creator boxes
+    preparatory::Title::title_screen_2p(
+        preparatory::Title::title_2_border,
+        preparatory::Title::title_2_text
+    );
+
+    // The Current Settings
     preparatory::Title::title_screen_3p(
         preparatory::Title::title_3_subtitle,
         preparatory::Title::title_3_border,
@@ -373,11 +492,6 @@ void preparatory::Title::title_screen() {
     );
 
     // The switching option
-    preparatory::Title::title_screen_4l(
-        preparatory::Title::title_4_subtitle,
-        preparatory::Title::title_4_border
-    );
-
     preparatory::Title::title_screen_4p(
         preparatory::Title::title_4_subtitle,
         preparatory::Title::title_4_border
@@ -430,10 +544,12 @@ void preparatory::Title::title_screen() {
         }
     }
 
+    return given_choice;
+
     // Move on to next part of screen
-	refresh();
-	getch();
-    curs_set(1);
+	//refresh();
+	//getch();
+    //curs_set(1);
 }
 
 // ==> Loaders
@@ -622,17 +738,7 @@ void preparatory::Title::title_screen_3l (
 
     // The ROYGBIV Part
     preparatory::priv::center_lr(title_3_text, "No Repeats, Randomized", 17, 500);
-    title_3_text.push_back(Output_con("R", 18, 34, Output_con::Coloration::Red));
-    title_3_text.push_back(Output_con(" ", 18, 35));
-    title_3_text.push_back(Output_con("O", 18, 36, Output_con::Coloration::Orange));
-    title_3_text.push_back(Output_con(" ", 18, 37));
-    title_3_text.push_back(Output_con("Y", 18, 38, Output_con::Coloration::Yellow));
-    title_3_text.push_back(Output_con(" ", 18, 39));
-    title_3_text.push_back(Output_con("G", 18, 40, Output_con::Coloration::Green));
-    title_3_text.push_back(Output_con(" ", 18, 41));
-    title_3_text.push_back(Output_con("B", 18, 42, Output_con::Coloration::Blue));
-    title_3_text.push_back(Output_con(" ", 18, 43));
-    title_3_text.push_back(Output_con("V", 18, 44, Output_con::Coloration::Violet));
+    preparatory::priv::valid_color_loader(title_3_text, valid_tokens, 18);
 }
 
 void preparatory::Title::title_screen_4l(
@@ -679,7 +785,7 @@ void preparatory::Title::title_screen_4l(
     */
 }
 
-// ==> Printing Functions
+// ==> Title Printing Functions
 
 void preparatory::Title::title_screen_1p(
     const std::vector<Output_con>& title_1_bord_1, 
@@ -841,6 +947,115 @@ void preparatory::Title::choice_printer(
     }
 }
 
+// ==> Help Functions
+
+void preparatory::Help::help_screen_load() {
+    // load the top of the help screen:
+    help_screen_1l(help_1_border, help_1_text);
+}
+
+void preparatory::Help::help_screen_inter() {
+
+}
+
+void preparatory::Help::help_screen_clear() {
+    // clear top title, to be fixed
+    preparatory::Help::help_1_border.clear();
+    preparatory::Help::help_1_text.clear();
+}
+
+// ==> Help Loader Functions
+
+void preparatory::Help::help_screen_1l (
+    std::vector<Output_con>& help_1_border,
+    std::vector<Output_con>& help_1_text
+) {
+    // load the border
+    // left side of outer, right side inner
+    help_1_border.push_back(Output_con("┃", 3, 0, 120, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 3, 77, 120, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┃", 2, 0, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 4, 0, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 2, 77, 60, false, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("*", 4, 77, 60, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┃", 1, 0, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 5, 0, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 1, 77, 60, false, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("*", 5, 77, 60, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┏", 0, 0, 120, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┗", 6, 0, 120, true, Output_con::Coloration::Red));
+    // the tops and bottoms
+    help_1_border.push_back(Output_con("━", 0, 1, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 6, 1, 30, true, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 0, 2, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 6, 2, 30, true, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 0, 3, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 6, 3, 30, true, Output_con::Coloration::Red));
+    for (int i = 0; i <= 71; ++i) {
+        help_1_border.push_back(Output_con("━", 0, (4+i), 15, false, Output_con::Coloration::Red));
+        help_1_border.push_back(Output_con("━", 6, (4+i), 15, false, Output_con::Coloration::Red));
+        help_1_border.push_back(Output_con("═", 1, (75-i), 15, false, Output_con::Coloration::Naught));
+        help_1_border.push_back(Output_con("═", 5, (75-i), 15, true, Output_con::Coloration::Naught));
+    }
+    help_1_border.push_back(Output_con("━", 0, 76, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 6, 76, 30, true, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 0, 77, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 6, 77, 30, true, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 0, 78, 30, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("━", 6, 78, 30, true, Output_con::Coloration::Red));
+    // right side of outer, left side of inner
+    help_1_border.push_back(Output_con("┓", 0, 79, 120, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┛", 6, 79, 120, true, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 1, 79, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 5, 79, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 1, 2, 60, false, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("*", 5, 2, 60, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┃", 2, 79, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("┃", 4, 79, 60, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 2, 2, 60, false, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("*", 4, 2, 60, true, Output_con::Coloration::Naught));
+    help_1_border.push_back(Output_con("┃", 3, 79, 120, false, Output_con::Coloration::Red));
+    help_1_border.push_back(Output_con("*", 3, 2, 120, true, Output_con::Coloration::Naught));
+
+    // Load the text
+    // H
+    preparatory::priv::scanner(help_1_text, {"╷", "├", "╵"}, 2, 28, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", "─", " "}, 2, 29, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", "─", " "}, 2, 30, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", "─", " "}, 2, 31, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", "─", " "}, 2, 32, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {"╷", "┤", "╵"}, 2, 33, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 34, Output_con::Coloration::Red);
+    // E
+    preparatory::priv::scanner(help_1_text, {"┌", "├", "└"}, 2, 35, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {"─", "─", "─"}, 2, 36, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {"─", "─", "─"}, 2, 37, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {"─", "─", "─"}, 2, 38, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {"╴", "╴", "╴"}, 2, 39, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 40, Output_con::Coloration::Red);
+    // L
+    preparatory::priv::scanner(help_1_text, {"╷", "│", "└"}, 2, 41, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", " ", "─"}, 2, 42, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", " ", "─"}, 2, 43, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", " ", "─"}, 2, 44, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", " ", "╴"}, 2, 45, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 46, Output_con::Coloration::Red);
+    // P
+    preparatory::priv::scanner(help_1_text, {"┌", "│", "╵"}, 2, 47, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {"─", "─", " "}, 2, 48, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {"─", "─", " "}, 2, 49, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {"─", "─", " "}, 2, 50, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {"╮", "╯", " "}, 2, 51, Output_con::Coloration::Red);
+    preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 52, Output_con::Coloration::Red);
+}
+
+void preparatory::Help::help_screen_1p(
+    const std::vector<Output_con>& help_1_border,
+    const std::vector<Output_con>& help_1_text
+){
+    
+}
+
 // ==> Auxiliary Functions
 
 void const preparatory::priv::printcon(const std::vector<Output_con>& outputvec) {
@@ -987,4 +1202,22 @@ void preparatory::priv::passer_lr(
             granvec.push_back(Output_con(s, y_dimu, (x_dimu + i), 0, false, col, attri));
         }
     }
+}
+
+void preparatory::priv::valid_color_loader(
+    std::vector <Output_con>& granvec,
+    const std::vector<std::string>& valid_tokens,
+    int y_dimu
+) {
+    granvec.push_back(Output_con(valid_tokens[0], y_dimu, 34, Output_con::Coloration::Red));
+    granvec.push_back(Output_con(" ", 18, 35));
+    granvec.push_back(Output_con(valid_tokens[1], y_dimu, 36, Output_con::Coloration::Orange));
+    granvec.push_back(Output_con(" ", 18, 37));
+    granvec.push_back(Output_con(valid_tokens[2], y_dimu, 38, Output_con::Coloration::Yellow));
+    granvec.push_back(Output_con(" ", 18, 39));
+    granvec.push_back(Output_con(valid_tokens[3], y_dimu, 40, Output_con::Coloration::Green));
+    granvec.push_back(Output_con(" ", 18, 41));
+    granvec.push_back(Output_con(valid_tokens[4], y_dimu, 42, Output_con::Coloration::Blue));
+    granvec.push_back(Output_con(" ", 18, 43));
+    granvec.push_back(Output_con(valid_tokens[5], y_dimu, 44, Output_con::Coloration::Violet));
 }
