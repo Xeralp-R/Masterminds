@@ -1,0 +1,3 @@
+language = "cpp"
+run = "clang++ -std=c++11 mastermind.cpp -o mastermind && ./mastermind "
+# run = "clang++ -std=c++11 -lncurses mastermind.cpp -o mastermind && ./mastermind 
