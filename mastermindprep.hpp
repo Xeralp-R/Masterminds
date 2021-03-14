@@ -447,6 +447,94 @@ namespace preparatory {
             int y_dimu
         );
     }
+
+    // * load in the alphabet in large 3-pixel height letters
+    namespace alpha {
+        void letter_a(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_d(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_e(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_h(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_i(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_l(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+
+        void letter_m(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_n(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_p(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_r(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_s(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+
+        void letter_t(
+            std::vector<Output_con>& granvec,
+            int y_dimu,
+            int x_dimu,
+            Output_con::Coloration col
+        );
+    };
 }
 
 // ==> Grand Definitions
@@ -714,79 +802,25 @@ void preparatory::Title::title_screen_1l(
     
     // Title Itself
     // M
-    preparatory::priv::scanner(title_1_text, {"╭", "│", "╵"}, 2, 8, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 9, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 10, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 11, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 12, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 13, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"╮", "│", "╵"}, 2, 14, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 15, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_m(title_1_text, 2, 8, Output_con::Coloration::Yellow);
     // A
-    preparatory::priv::scanner(title_1_text, {"╭", "├", "╵"}, 2, 16, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 17, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 18, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 19, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 20, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"╮", "┤", "╵"}, 2, 21, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 22, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_a(title_1_text, 2, 16, Output_con::Coloration::Yellow);
     // S
-    preparatory::priv::scanner(title_1_text, {"╭", "╰", "╶"}, 2, 23, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 24, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 25, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 26, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"╴", "╮", "╯"}, 2, 27, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 28, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_s(title_1_text, 2, 23, Output_con::Coloration::Yellow);
     // T
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 29, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 30, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 31, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 32, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 33, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 34, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_t(title_1_text, 2, 29, Output_con::Coloration::Yellow);
     // E
-    preparatory::priv::scanner(title_1_text, {"┌", "├", "└"}, 2, 35, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 36, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 37, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", "─"}, 2, 38, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"╴", "╴", "╴"}, 2, 39, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 40, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_e(title_1_text, 2, 35, Output_con::Coloration::Yellow);
     // R
-    preparatory::priv::scanner(title_1_text, {"┌", "│", "╵"}, 2, 41, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 42, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "─", " "}, 2, 43, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", "┬", "╰"}, 2, 44, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"╮", "╯", "─"}, 2, 45, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 46, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_r(title_1_text, 2, 41, Output_con::Coloration::Yellow);
     // M
-    preparatory::priv::scanner(title_1_text, {"╭", "│", "╵"}, 2, 47, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 48, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 49, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"┬", "│", "╵"}, 2, 50, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 51, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", " "}, 2, 52, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"╮", "│", "╵"}, 2, 53, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 54, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_m(title_1_text, 2, 47, Output_con::Coloration::Yellow);
     // I
-    preparatory::priv::scanner(title_1_text, {"╶", " ", "╶"}, 2, 55, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 56, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"┬", "│", "┴"}, 2, 57, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 58, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"╴", " ", "╴"}, 2, 59, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", " ", " "}, 2, 60, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_i(title_1_text, 2, 55, Output_con::Coloration::Yellow);
     // N
-    preparatory::priv::scanner(title_1_text, {"╭",  "│", "╵"}, 2, 61, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"\\", " ", " "}, 2, 62, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", "\\", " "}, 2, 63, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ", " ", "\\"}, 2, 64, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"╷",  "│", "╯"}, 2, 65, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {" ",  " ", " "}, 2, 66, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_n(title_1_text, 2, 61, Output_con::Coloration::Yellow);
     // D
-    preparatory::priv::scanner(title_1_text, {"┌", "│", "└"}, 2, 67, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 68, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 69, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"─", " ", "─"}, 2, 70, Output_con::Coloration::Yellow);
-    preparatory::priv::scanner(title_1_text, {"╮", "│", "╯"}, 2, 71, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_d(title_1_text, 2, 67, Output_con::Coloration::Yellow);
 }
 
 void preparatory::Title::title_screen_2l(
@@ -1383,34 +1417,13 @@ void preparatory::Help::help_screen_1l (
 
     // Load the text
     // H
-    preparatory::priv::scanner(help_1_text, {"╷", "├", "╵"}, 2, 28, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", "─", " "}, 2, 29, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", "─", " "}, 2, 30, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", "─", " "}, 2, 31, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", "─", " "}, 2, 32, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {"╷", "┤", "╵"}, 2, 33, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 34, Output_con::Coloration::Red);
+    preparatory::alpha::letter_h(help_1_text, 2, 28, Output_con::Coloration::Red);
     // E
-    preparatory::priv::scanner(help_1_text, {"┌", "├", "└"}, 2, 35, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {"─", "─", "─"}, 2, 36, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {"─", "─", "─"}, 2, 37, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {"─", "─", "─"}, 2, 38, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {"╴", "╴", "╴"}, 2, 39, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 40, Output_con::Coloration::Red);
+    preparatory::alpha::letter_e(help_1_text, 2, 35, Output_con::Coloration::Red);
     // L
-    preparatory::priv::scanner(help_1_text, {"╷", "│", "└"}, 2, 41, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", " ", "─"}, 2, 42, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", " ", "─"}, 2, 43, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", " ", "─"}, 2, 44, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", " ", "╴"}, 2, 45, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 46, Output_con::Coloration::Red);
+    preparatory::alpha::letter_l(help_1_text, 2, 41, Output_con::Coloration::Red);
     // P
-    preparatory::priv::scanner(help_1_text, {"┌", "│", "╵"}, 2, 47, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {"─", "─", " "}, 2, 48, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {"─", "─", " "}, 2, 49, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {"─", "─", " "}, 2, 50, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {"╮", "╯", " "}, 2, 51, Output_con::Coloration::Red);
-    preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 52, Output_con::Coloration::Red);
+    preparatory::alpha::letter_p(help_1_text, 2, 47, Output_con::Coloration::Red);
 }
 
 void preparatory::Help::help_screen_2l(
@@ -2142,4 +2155,178 @@ void preparatory::priv::valid_color_loader(
     granvec.push_back(Output_con(valid_tokens[4], y_dimu, 42, Output_con::Coloration::Blue));
     granvec.push_back(Output_con(" ", 18, 43));
     granvec.push_back(Output_con(valid_tokens[5], y_dimu, 44, Output_con::Coloration::Violet));
+}
+
+// letter generators
+
+void preparatory::alpha::letter_a(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"╭", "├", "╵"}, y_dimu, x_dimu, Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(granvec, {"─", "─", " "}, y_dimu, (x_dimu+1), Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(granvec, {"─", "─", " "}, y_dimu, (x_dimu+2), Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(granvec, {"─", "─", " "}, y_dimu, (x_dimu+3), Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(granvec, {"─", "─", " "}, y_dimu, (x_dimu+4), Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(granvec, {"╮", "┤", "╵"}, y_dimu, (x_dimu+5), Output_con::Coloration::Yellow);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+6), Output_con::Coloration::Yellow);
+}
+
+void preparatory::alpha::letter_d(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"┌", "│", "└"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {"─", " ", "─"}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {"─", " ", "─"}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {"─", " ", "─"}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {"╮", "│", "╯"}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+5), col);
+}
+
+void preparatory::alpha::letter_e(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"┌", "├", "└"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {"─", "─", "─"}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {"─", "─", "─"}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {"─", "─", "─"}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {"╴", "╴", "╴"}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+5), col);
+}
+
+void preparatory::alpha::letter_h(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"╷", "├", "╵"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {" ", "─", " "}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {" ", "─", " "}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {" ", "─", " "}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {" ", "─", " "}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {"╷", "┤", "╵"}, y_dimu, (x_dimu+5), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+6), col);
+}
+
+void preparatory::alpha::letter_i(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"╶", " ", "╶"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {"─", " ", "─"}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {"┬", "│", "┴"}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {"─", " ", "─"}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {"╴", " ", "╴"}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+5), col);
+}
+
+void preparatory::alpha::letter_l(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"╷", "│", "└"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {" ", " ", "─"}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {" ", " ", "─"}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {" ", " ", "─"}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {" ", " ", "╴"}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+5), col);
+}
+
+void preparatory::alpha::letter_m(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"╭", "│", "╵"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {"─", " ", " "}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {"─", " ", " "}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {"┬", "│", "╵"}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {"─", " ", " "}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {"─", " ", " "}, y_dimu, (x_dimu+5), col);
+    preparatory::priv::scanner(granvec, {"╮", "│", "╵"}, y_dimu, (x_dimu+6), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+7), col);
+}
+
+void preparatory::alpha::letter_n(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"╭",  "│", "╵"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {"\\", " ", " "}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {" ", "\\", " "}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {" ", " ", "\\"}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {"╷",  "│", "╯"}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {" ",  " ", " "}, y_dimu, (x_dimu+5), col);
+}
+
+void preparatory::alpha::letter_p(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"┌", "│", "╵"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {"─", "─", " "}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {"─", "─", " "}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {"─", "─", " "}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {"╮", "╯", " "}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+5), col);
+}
+
+void preparatory::alpha::letter_r(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"┌", "│", "╵"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {"─", "─", " "}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {"─", "─", " "}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {"─", "┬", "╰"}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {"╮", "╯", "─"}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+5), col);
+}
+
+void preparatory::alpha::letter_s(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"╭", "╰", "╶"}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {"─", "─", "─"}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {"─", "─", "─"}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {"─", "─", "─"}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {"╴", "╮", "╯"}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+5), col);
+}
+
+void preparatory::alpha::letter_t(
+    std::vector<Output_con>& granvec,
+    int y_dimu,
+    int x_dimu,
+    Output_con::Coloration col
+) {
+    preparatory::priv::scanner(granvec, {"─", " ", " "}, y_dimu, (x_dimu), col);
+    preparatory::priv::scanner(granvec, {"─", " ", " "}, y_dimu, (x_dimu+1), col);
+    preparatory::priv::scanner(granvec, {"┬", "│", "╵"}, y_dimu, (x_dimu+2), col);
+    preparatory::priv::scanner(granvec, {"─", " ", " "}, y_dimu, (x_dimu+3), col);
+    preparatory::priv::scanner(granvec, {"─", " ", " "}, y_dimu, (x_dimu+4), col);
+    preparatory::priv::scanner(granvec, {" ", " ", " "}, y_dimu, (x_dimu+5), col);
 }
