@@ -351,6 +351,20 @@ namespace preparatory {
                 std::vector<Output_con>& granvec,
                 WINDOW * given_win
             );
+
+            // load and print out the state of the 1st explain screen
+            void help_choice_printer_1(
+                Help::Help_state given_choice,
+                std::vector<Output_con>& granvec,
+                WINDOW * given_win
+            );
+
+            // load and print out the state of the second explain screen
+            void help_choice_printer_2(
+                Help::Help_state given_choice,
+                std::vector<Output_con>& granvec,
+                WINDOW * given_win
+            );
     };
 
     // All of the private data that needs to be kept away from mastermind.
@@ -1078,15 +1092,17 @@ void preparatory::Help::help_screen_inter() {
     // bool that will declare whether we go back to main
     bool reenter_main = false;
 
+    // place outside because this will only load once
+    help_screen_1p(
+        preparatory::Help::help_1_border, 
+        preparatory::Help::help_1_text, 
+        Help_Titular
+    );
+
+    // the governing while loop
     while (!reenter_main) {
 
         // print out the help screen
-        help_screen_1p(
-            preparatory::Help::help_1_border, 
-            preparatory::Help::help_1_text, 
-            Help_Titular
-        );
-
         help_screen_2p(
             preparatory::Help::help_2_border,
             Help_Primary
@@ -1146,6 +1162,8 @@ void preparatory::Help::help_screen_inter() {
                 preparatory::Help::help_screen_explain_1(Help_Primary);
                 if (explain_state == preparatory::Help::Help_state::Explain_2) {
                     am_i_out_yet = preparatory::Help::help_screen_explain_2(Help_Primary);
+                } else if (explain_state == preparatory::Help::Help_state::Help_screen) {
+                    am_i_out_yet = true;
                 }
             }
         } else if (given_help_state_1 == preparatory::Help::Help_state::Refresh) {
@@ -1155,11 +1173,11 @@ void preparatory::Help::help_screen_inter() {
         }
     }
 
-    curs_set(1);
+    //curs_set(1);
 
-    wgetch(Help_Primary);
+    //wgetch(Help_Primary);
 
-    curs_set(0);
+    //curs_set(0);
 
     delwin(Help_Titular);
     delwin(Help_Primary);
@@ -1188,10 +1206,45 @@ void preparatory::Help::help_screen_clear() {
 preparatory::Help::Help_state preparatory::Help::help_screen_explain_1(
     WINDOW * given_win
 ) {
+    // clear the window
+    //wclear(given_win);
+
+    // output the text
     help_screen_3p(help_3_mtext, help_34_border, given_win);
-    wgetch(given_win);
-    // ==> Fill
-    return preparatory::Help::Help_state::Explain_2;
+
+    // prepare te default game state
+    preparatory::Help::Help_state given_help_state_2 = preparatory::Help::Help_state::Explain_2;
+
+    //print that out
+    help_choice_printer_1(given_help_state_2, help_3_stext, given_win);
+
+    // get the character
+    int given_help_switcher_2 = 0;
+
+    // whether the person has made a choice yet
+    bool help_got_in_2 = false;
+
+    while (!help_got_in_2) {
+        given_help_switcher_2 = wgetch(given_win);
+
+        switch(given_help_switcher_2) {
+            case KEY_RIGHT: // apparently, it has the same effect whether you go key right or key left!
+            case KEY_LEFT:  // makes my job easier.
+                if (given_help_state_2 == preparatory::Help::Help_state::Explain_2) {
+                    given_help_state_2 = preparatory::Help::Help_state::Help_screen;
+                } else if (given_help_state_2 == preparatory::Help::Help_state::Help_screen) {
+                    given_help_state_2 = preparatory::Help::Help_state::Explain_2;
+                }
+
+                help_choice_printer_1(given_help_state_2, help_3_stext, given_win);
+                break;
+            case 10:
+                help_got_in_2 = true;
+                break;
+        }
+    }
+
+    return given_help_state_2;
 }
 
 // govern the input of entries into the second explain screen
@@ -1200,10 +1253,48 @@ bool preparatory::Help::help_screen_explain_2(
     WINDOW * given_win
 ) {
     help_screen_4p(help_4_mtext, help_34_border, given_win);
-    wgetch(given_win);
-    // ==> Fill
-    return true;
-}
+
+    // prepare the defualt state of choices
+    // back to the help screen
+    preparatory::Help::Help_state given_help_state_3 = preparatory::Help::Help_state::Help_screen;
+
+    // print out that first state
+    preparatory::Help::help_choice_printer_2(given_help_state_3, help_4_stext, given_win);
+
+    // initialize the char
+    int given_help_switcher_3 = 0;
+
+    // initialize the bool to get out
+    bool help_got_in_3 = false;
+
+    while (!help_got_in_3) {
+        given_help_switcher_3 = wgetch(given_win);
+
+        switch(given_help_switcher_3) {
+            case KEY_RIGHT:
+            case KEY_LEFT:
+                if (given_help_state_3 == preparatory::Help::Help_state::Help_screen) {
+                    given_help_state_3 = preparatory::Help::Help_state::Explain_1;
+                } else if (given_help_state_3 == preparatory::Help::Help_state::Explain_1) {
+                    given_help_state_3 = preparatory::Help::Help_state::Help_screen;
+                }
+
+                help_choice_printer_2(given_help_state_3, help_4_stext, given_win);
+                break;
+            case 10:
+                help_got_in_3 = true;
+                break;
+        }
+    }
+
+    if (given_help_state_3 == preparatory::Help::Help_state::Help_screen) {
+        return true;
+    } else if (given_help_state_3 == preparatory::Help::Help_state::Explain_1) {
+        return false;
+    } else {
+        return true;
+    }
+} // you may see this cuase an error– that's expected
 
 // govern the input of entry into the refresher screen
 // upon returning, go back to running the help screen
@@ -1211,8 +1302,29 @@ void preparatory::Help::help_screen_refresher(
     WINDOW * given_win
 ) {
     help_screen_5p(help_5_mtext, help_5_border, given_win);
-    wgetch(given_win);
-    // ==> Fill
+
+    // rpint out the single choice
+    preparatory::priv::passer_lr(
+        help_5_stext,
+        "Back to Help",
+        15, 34,
+        Output_con::Coloration::Yellow,
+        Output_con::Attribute::Reversed,
+        false
+    );
+
+    preparatory::priv::wprintcon(given_win, help_5_stext);
+
+    // get the player input
+    int given_help_switcher_4 = 0;
+
+    // while the ainput is not yet a return
+    while (given_help_switcher_4 != 10){
+        // continue getting characters
+        given_help_switcher_4 = wgetch(given_win);
+    }
+    
+    // end
     return;
 }
 
@@ -1321,7 +1433,7 @@ void preparatory::Help::help_screen_2l(
     );
     // load the border
     help_2_border.push_back(Output_con("╔", 4, 19, 30, false, Output_con::Coloration::Violet));
-    help_2_border.push_back(Output_con("╝", 12, 59, 30, true, Output_con::Coloration::Violet));
+    help_2_border.push_back(Output_con("╝", 12, 58, 30, true, Output_con::Coloration::Violet));
     for (int i = 0; i <= 37; ++i) {
         help_2_border.push_back(Output_con("═", 4, (20+i), 30, false, Output_con::Coloration::Violet));
         help_2_border.push_back(Output_con("═", 12, (57-i), 30, true, Output_con::Coloration::Violet));
@@ -1539,21 +1651,21 @@ void preparatory::Help::help_screen_5l(
 
     // the border
      preparatory::priv::scanner(
-        help_34_border,
+        help_5_border,
         {"╒", "│", "╘"},
         14, 30,
         Output_con::Coloration::Blue
     );
-    for (int i = 0; i <= 10; ++i) {
+    for (int i = 0; i <= 17; ++i) {
         preparatory::priv::scanner(
-            help_34_border,
+            help_5_border,
             {"═", " ", "═"},
             14, (31 + i),
             Output_con::Coloration::Blue
         );
     }
     preparatory::priv::scanner(
-        help_34_border,
+        help_5_border,
         {"╕", "│", "╛"},
         14, 49,
         Output_con::Coloration::Blue
@@ -1578,6 +1690,8 @@ void preparatory::Help::help_screen_2p(
     const std::vector<Output_con>& help_2_border,
     WINDOW * given_win
 ) {
+    wclear(given_win);
+
     preparatory::priv::wprintcon(given_win, help_2_border);
 }
 
@@ -1586,6 +1700,8 @@ void preparatory::Help::help_screen_3p(
     const std::vector<Output_con>& help_34_border,
     WINDOW * given_win
 ) {
+    wclear(given_win);
+
     preparatory::priv::wprintcon(given_win, help_3_mtext);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -1598,6 +1714,8 @@ void preparatory::Help::help_screen_4p(
     const std::vector<Output_con>& help_34_border,
     WINDOW * given_win
 ) {
+    wclear(given_win);
+
     preparatory::priv::wprintcon(given_win, help_4_mtext);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -1610,6 +1728,8 @@ void preparatory::Help::help_screen_5p(
     const std::vector<Output_con>& help_5_border,
     WINDOW * given_win
 ) {
+    wclear(given_win);
+
     preparatory::priv::wprintcon(given_win, help_5_mtext);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -1705,6 +1825,105 @@ void preparatory::Help::main_choice_printer(
         granvec.clear();
     } else {
         error ("Absurd implementation of home screen choice");
+    }
+}
+
+// load and print out the state of the 1st explain screen
+void preparatory::Help::help_choice_printer_1(
+    Help::Help_state given_choice,
+    std::vector<Output_con>& granvec,
+    WINDOW * given_win
+) {
+    if (given_choice == preparatory::Help::Help_state::Explain_2) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Back to Help",
+            15, 24, // 22?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Next",
+            15, 48, // 46?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::wprintcon(given_win, granvec);
+        granvec.clear();
+    } else if (given_choice == preparatory::Help::Help_state::Help_screen) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Back to Help",
+            15, 24, // cor 24
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Next",
+            15, 48, // cor 48
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::wprintcon(given_win, granvec);
+        granvec.clear();
+    } else {
+        error("Absurd implementation of help screen choices");
+    }
+}
+
+// load and print out the state of the second explain screen
+void preparatory::Help::help_choice_printer_2(
+    Help::Help_state given_choice,
+    std::vector<Output_con>& granvec,
+    WINDOW * given_win
+) {
+    if (given_choice == preparatory::Help::Help_state::Help_screen) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Previous",
+            15, 26, // 24?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Back to Help",
+            15, 43, // 45?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::wprintcon(given_win, granvec);
+        granvec.clear();
+    } else if (given_choice == preparatory::Help::Help_state::Explain_1) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Previous",
+            15, 26, // 24?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "Back to Help",
+            15, 43, // 45?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::wprintcon(given_win, granvec);
+        granvec.clear();
+    } else {
+        error("Absurd implementation of 2nd explain screen");
+        EXIT_FAILURE;
     }
 }
 
