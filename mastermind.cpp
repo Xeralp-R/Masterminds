@@ -7,12 +7,6 @@ input: OVB ORB ROB RVB RYB RGB
 //#include "ncurses.h"
 //#include "letssee.hpp"
 #include "mastermindprep.hpp"
-// Library that allows you to manipulate the terminal
-//#include "ncurses.h"
-// #include iostream to the max
-#include "letssee.hpp"
-// what Rex is working on
-//#include "mastermindprep.hpp"
 using namespace std;
 
 // The overarching function.
@@ -168,7 +162,10 @@ int main (int argc, char* argv[]) {
 }
 
 void overarch() {
-    //error("Error");
+    preparatory::antecedent();
+    preparatory::begin_ncurses();
+    preparatory::startup();
+    /*
     for (int i = 0; i < 7; ++i)
     {
         cinput(i);
@@ -178,4 +175,6 @@ void overarch() {
             break;
         }
     }
+    */
+    preparatory::end_ncurses();
 }

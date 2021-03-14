@@ -123,6 +123,15 @@ std::vector<std::string> valid_tokens = {"R", "O", "Y", "G", "B", "V"};
 
 // The namespace that will contain all of the preparatory functions.
 namespace preparatory {
+    // The first preparatory function, before starting ncurses.
+    void antecedent();
+
+    // begin ncurses
+    void begin_ncurses();
+
+    // end ncurses
+    void end_ncurses();
+
     // The general, overarching preparatory function.
     void startup();
     
@@ -539,7 +548,7 @@ namespace preparatory {
 
 // ==> Grand Definitions
 
-void preparatory::startup() {
+void preparatory::antecedent() {
     // before NCURSES is called
     std::cout << "This file has been designed with the library \u001b[1mNCURSES\u001b[0m in mind." << std::endl;
     std::cout << "You will also require an \u001b[1m80-pixel width terminal or wider.\u001b[0m" << std::endl;
@@ -552,6 +561,9 @@ void preparatory::startup() {
         keep_window_open_cont();
     }
     */
+}
+
+void preparatory::begin_ncurses () {
     // call NCURSES
     setlocale(LC_ALL, "");
     initscr();
@@ -580,7 +592,16 @@ void preparatory::startup() {
 
     // let's get our arrow keys
     keypad(stdscr, true);
+}
 
+void preparatory::end_ncurses () {
+    refresh();
+    curs_set(1);
+    getch();
+    endwin();
+}
+
+void preparatory::startup() {
     // prepare the game title
     preparatory::Title Game_Title;
 
@@ -608,6 +629,7 @@ void preparatory::startup() {
             // The settings screen
         } else if (titular_state == preparatory::Title::Title_state::Play) {
             game_passant = true;
+            return;
             //break;
         }
         if (game_passant == false) {
@@ -617,11 +639,6 @@ void preparatory::startup() {
             titular_state = Game_Title.preparatory::Title::title_screen_print();
         }
     }
-
-    refresh();
-    curs_set(1);
-    getch();
-    endwin();
 }
 
 // ==> Title Functions
