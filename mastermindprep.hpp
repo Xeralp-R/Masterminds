@@ -219,9 +219,6 @@ namespace preparatory {
             void choice_printer(Title::Title_state given_choice, std::vector<Output_con>& granvec);
     };
 
-    // Prints the help screen and accepts the inputs given to it.
-    void help_screen();
-
     class Help {
         public:
             // Constructor?
@@ -256,6 +253,24 @@ namespace preparatory {
                 std::vector<Output_con>& help_1_text
             );
 
+            // load the menu border
+            void help_screen_2l(
+                std::vector<Output_con>& help_2_border
+            );
+
+            // loads the explain bit
+            void help_screen_34l(
+                std::vector<Output_con>& help_3_mtext,
+                std::vector<Output_con>& help_4_mtext,
+                std::vector<Output_con>& help_34_border
+            );
+
+            // loads the refresher
+            void help_screen_5l(
+                std::vector<Output_con>& help_5_mtext,
+                std::vector<Output_con>& help_5_border
+            );
+
             // prints the title portion in its own window
             void help_screen_1p(
                 const std::vector<Output_con>& help_1_border,
@@ -263,14 +278,48 @@ namespace preparatory {
                 WINDOW * given_win
             );
 
-            // load the menu border
-            void help_screen_2l(
-                std::vector<Output_con>& help_2_border
-            );
-
             // print the menu border
             void help_screen_2p(
                 const std::vector<Output_con>& help_2_border,
+                WINDOW * given_win
+            );
+
+            // prints the explain part 1
+            void help_screen_3p(
+                const std::vector<Output_con>& help_3_mtext,
+                const std::vector<Output_con>& help_34_border,
+                WINDOW * given_win
+            );
+
+            // prints the explain part 2
+            void help_screen_4p(
+                const std::vector<Output_con>& help_4_mtext,
+                const std::vector<Output_con>& help_34_border,
+                WINDOW * given_win
+            );
+
+            // prints the refreshervoid 
+            void help_screen_5p(
+                const std::vector<Output_con>& help_5_mtext,
+                const std::vector<Output_con>& help_5_border,
+                WINDOW * given_win
+            );
+
+            // govern the input of entries into the first explain screen
+            // return the passed enum class
+            Help_state help_screen_explain_1(
+                WINDOW * given_win
+            );
+
+            // govern the input of entries into the second explain screen
+            // return whether the user decided to go out or not
+            bool help_screen_explain_2(
+                WINDOW * given_win
+            );
+
+            // govern the input of entry into the refresher screen
+            // upon returning, go back to running the help screen
+            void help_screen_refresher(
                 WINDOW * given_win
             );
 
@@ -281,6 +330,27 @@ namespace preparatory {
             // vectors that will contain the main menu
             std::vector<Output_con> help_2_border {};
             std::vector<Output_con> help_2_text {};
+
+            // vectors that will contain the explain part 1
+            std::vector<Output_con> help_3_mtext {};
+            std::vector<Output_con> help_34_border {}; // for both 3 and 4
+            std::vector<Output_con> help_3_stext {};
+
+            // vectors that will contain the explain part 2
+            std::vector<Output_con> help_4_mtext {};
+            std::vector<Output_con> help_4_stext {};
+
+            // vectors that will contain the refresher
+            std::vector<Output_con> help_5_mtext {};
+            std::vector<Output_con> help_5_border {};
+            std::vector<Output_con> help_5_stext {};
+
+            // print out the title state
+            void main_choice_printer(
+                Help::Help_state given_choice, 
+                std::vector<Output_con>& granvec,
+                WINDOW * given_win
+            );
     };
 
     // All of the private data that needs to be kept away from mastermind.
@@ -322,6 +392,17 @@ namespace preparatory {
             int y_dimu, 
             int lastwait, 
             Output_con::Coloration col
+        );
+        
+        // Center text, and provide color, atribute, will_return, and many more!
+        // No last wait, though– I don't think there's a need for it.
+        void center_lr(
+            std::vector <Output_con>& granvec, 
+            std::string outstr, 
+            int y_dimu, 
+            Output_con::Coloration col,
+            Output_con::Attribute attri,
+            bool will_return
         );
 
         // Pass a string, horizontal, and it's positions.
@@ -961,6 +1042,19 @@ void preparatory::Help::help_screen_load() {
 
     // load the subtitles and choices and stuff
     help_screen_2l(help_2_border);
+
+    // load the explain pages
+    help_screen_34l(
+        help_3_mtext,
+        help_4_mtext,
+        help_34_border
+    );
+
+    // load the refresher page
+    help_screen_5l(
+        help_5_mtext,
+        help_5_border
+    );
 }
 
 void preparatory::Help::help_screen_inter() {
@@ -975,20 +1069,91 @@ void preparatory::Help::help_screen_inter() {
     WINDOW * Help_Primary;
     Help_Primary = newwin(17, 80, 7, 0);
 
+    // get our arrow keys for help primary?
+    keypad(Help_Primary, true);
+
     // Make screen white on black
     // wbkgd(stdscr, COLOR_PAIR(1));
 
-    // print out the help screen
-    help_screen_1p(
-        preparatory::Help::help_1_border, 
-        preparatory::Help::help_1_text, 
-        Help_Titular
-    );
+    // bool that will declare whether we go back to main
+    bool reenter_main = false;
 
-    help_screen_2p(
-        preparatory::Help::help_2_border,
-        Help_Primary
-    );
+    while (!reenter_main) {
+
+        // print out the help screen
+        help_screen_1p(
+            preparatory::Help::help_1_border, 
+            preparatory::Help::help_1_text, 
+            Help_Titular
+        );
+
+        help_screen_2p(
+            preparatory::Help::help_2_border,
+            Help_Primary
+        );
+
+        // prepare the default game state
+        preparatory::Help::Help_state given_help_state_1 = preparatory::Help::Help_state::Explain_1;
+
+        // print out the choice
+        main_choice_printer(given_help_state_1, help_2_text, Help_Primary);
+
+        // int that will contain the input?
+        int given_help_switcher_1 = 0;
+
+        // bool that will state whether to get out of the loop and go to another screen
+        bool help_got_in_1 = false;
+
+        while (!help_got_in_1) {    
+            given_help_switcher_1 = wgetch(Help_Primary);
+
+            switch(given_help_switcher_1) {
+                case KEY_UP:
+                    if (given_help_state_1 == preparatory::Help::Help_state::Explain_1) {
+                        given_help_state_1 = preparatory::Help::Help_state::Title_screen;
+                    } else if (given_help_state_1 == preparatory::Help::Help_state::Title_screen) {
+                        given_help_state_1 = preparatory::Help::Help_state::Refresh;
+                    } else if (given_help_state_1 == preparatory::Help::Help_state::Refresh) {
+                        given_help_state_1 = preparatory::Help::Help_state::Explain_1;
+                    }
+
+                    // print the change
+                    main_choice_printer(given_help_state_1, help_2_text, Help_Primary);
+                    break;
+                case KEY_DOWN:
+                    if (given_help_state_1 == preparatory::Help::Help_state::Explain_1) {
+                        given_help_state_1 = preparatory::Help::Help_state::Refresh;
+                    } else if (given_help_state_1 == preparatory::Help::Help_state::Refresh) {
+                        given_help_state_1 = preparatory::Help::Help_state::Title_screen;
+                    } else if (given_help_state_1 == preparatory::Help::Help_state::Title_screen) {
+                        given_help_state_1 = preparatory::Help::Help_state::Explain_1;
+                    }
+
+                    // print the change
+                    main_choice_printer(given_help_state_1, help_2_text, Help_Primary);
+                    break;
+                case 10: // char(10) is the return, or endl
+                    help_got_in_1 = true;
+                    break;
+            }
+        }
+
+        // act on the choice given
+        if (given_help_state_1 == preparatory::Help::Help_state::Explain_1) {
+            bool am_i_out_yet = false;
+            while (!am_i_out_yet) {
+                preparatory::Help::Help_state explain_state = 
+                preparatory::Help::help_screen_explain_1(Help_Primary);
+                if (explain_state == preparatory::Help::Help_state::Explain_2) {
+                    am_i_out_yet = preparatory::Help::help_screen_explain_2(Help_Primary);
+                }
+            }
+        } else if (given_help_state_1 == preparatory::Help::Help_state::Refresh) {
+            preparatory::Help::help_screen_refresher(Help_Primary);
+        } else if (given_help_state_1 == preparatory::Help::Help_state::Title_screen) {
+            reenter_main = true;
+        }
+    }
 
     curs_set(1);
 
@@ -1005,6 +1170,50 @@ void preparatory::Help::help_screen_clear() {
     preparatory::Help::help_1_border.clear();
     preparatory::Help::help_1_text.clear();
     preparatory::Help::help_2_border.clear();
+    preparatory::Help::help_2_text.clear();
+    preparatory::Help::help_34_border.clear();
+    preparatory::Help::help_3_mtext.clear();
+    preparatory::Help::help_3_stext.clear();
+    preparatory::Help::help_4_mtext.clear();
+    preparatory::Help::help_4_stext.clear();
+    preparatory::Help::help_5_border.clear();
+    preparatory::Help::help_5_mtext.clear();
+    preparatory::Help::help_5_stext.clear();
+}
+
+// ==> Help Sub-functions
+
+// govern the input of entries into the first explain screen
+// return the passed enum class
+preparatory::Help::Help_state preparatory::Help::help_screen_explain_1(
+    WINDOW * given_win
+) {
+    help_screen_3p(help_3_mtext, help_34_border, given_win);
+    wgetch(given_win);
+    // ==> Fill
+    return preparatory::Help::Help_state::Explain_2;
+}
+
+// govern the input of entries into the second explain screen
+// return whether the user decided to go out or not
+bool preparatory::Help::help_screen_explain_2(
+    WINDOW * given_win
+) {
+    help_screen_4p(help_4_mtext, help_34_border, given_win);
+    wgetch(given_win);
+    // ==> Fill
+    return true;
+}
+
+// govern the input of entry into the refresher screen
+// upon returning, go back to running the help screen
+void preparatory::Help::help_screen_refresher(
+    WINDOW * given_win
+) {
+    help_screen_5p(help_5_mtext, help_5_border, given_win);
+    wgetch(given_win);
+    // ==> Fill
+    return;
 }
 
 // ==> Help Loader Functions
@@ -1111,23 +1320,244 @@ void preparatory::Help::help_screen_2l(
         Output_con::Coloration::Orange
     );
     // load the border
-    /*
-    preparatory::priv::center_lr(
-        help_2_border, 
-        "╔══════════════════════════════════════╗", 
-        4, 
-        60, 
-        Output_con::Coloration::Purple
-    );
-    */
-    help_2_border.push_back(Output_con("╔", 4, 20, 30, false, Output_con::Coloration::Violet));
-    help_2_border.push_back(Output_con("╝", 11, 59, 30, true, Output_con::Coloration::Violet));
+    help_2_border.push_back(Output_con("╔", 4, 19, 30, false, Output_con::Coloration::Violet));
+    help_2_border.push_back(Output_con("╝", 12, 59, 30, true, Output_con::Coloration::Violet));
     for (int i = 0; i <= 37; ++i) {
-        help_2_border.push_back(Output_con("═", 4, (21+i), 30, false, Output_con::Coloration::Violet));
-        help_2_border.push_back(Output_con("═", 11, (58-i), 30, true, Output_con::Coloration::Violet));
+        help_2_border.push_back(Output_con("═", 4, (20+i), 30, false, Output_con::Coloration::Violet));
+        help_2_border.push_back(Output_con("═", 12, (57-i), 30, true, Output_con::Coloration::Violet));
     }
-    help_2_border.push_back(Output_con("╗", 4, 59, 30, false, Output_con::Coloration::Violet));
-    help_2_border.push_back(Output_con("╚", 11, 20, 30, true, Output_con::Coloration::Violet));
+    help_2_border.push_back(Output_con("╗", 4, 58, 30, false, Output_con::Coloration::Violet));
+    help_2_border.push_back(Output_con("╚", 12, 19, 30, true, Output_con::Coloration::Violet));
+}
+
+void preparatory::Help::help_screen_34l(
+    std::vector<Output_con>& help_3_mtext,
+    std::vector<Output_con>& help_4_mtext,
+    std::vector<Output_con>& help_34_border
+) {
+    // the actual text itself of the first explain screen
+    preparatory::priv::center_lr(
+        help_3_mtext, 
+        "What is Mastermind?", 
+        1, 60,
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_3_mtext, 
+        "\"Mastermind is a code-breaking game,\"", 
+        3, 60, 
+        Output_con::Coloration::Orange
+    );
+    preparatory::priv::center_lr(
+        help_3_mtext, 
+        "\"made for 2 players.\"", 
+        4, 60, 
+        Output_con::Coloration::Orange
+    );
+    preparatory::priv::center_lr(
+        help_3_mtext, 
+        "* This implementation only requires 1, however.", 
+        5, 60, 
+        Output_con::Coloration::Blue
+    );
+    preparatory::priv::center_lr(
+        help_3_mtext, 
+        "The computer generates 3 colors,", 
+        7, 60, 
+        Output_con::Coloration::Yellow
+    );
+    preparatory::priv::center_lr(
+        help_3_mtext, 
+        "of the 6 possible options:", 
+        8, 60, 
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_3_mtext, 
+        "Red, Orange, Yellow, Green, Blue, and Violet.", 
+        9, 60, 
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_3_mtext, 
+        "Depending on your settings, this code can be made", 
+        11, 60, 
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_3_mtext, 
+        "either to repeat values or not to do so.", 
+        12, 60, 
+        Output_con::Coloration::Naught
+    );
+
+    // the second explain screen
+    preparatory::priv::center_lr(
+        help_4_mtext, 
+        "What is Mastermind?", 
+        1, 60,
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_4_mtext, 
+        "You will then have 7 opportunities to guess", 
+        3, 60, 
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_4_mtext, 
+        "what the correct code is.", 
+        4, 60, 
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_4_mtext, 
+        "You will then be given a score, with 3 sorted values,", 
+        6, 60, 
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_4_mtext, 
+        "with each value ranging from 2 to 0:", 
+        7, 60, 
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_4_mtext, 
+        "2 means you have a color and position correct,", 
+        8, 60, 
+        Output_con::Coloration::Orange
+    );
+    preparatory::priv::center_lr(
+        help_4_mtext, 
+        "1 means you have a color correct, but in the incorrect position,", 
+        9, 60, 
+        Output_con::Coloration::Orange
+    );
+    preparatory::priv::center_lr(
+        help_4_mtext, 
+        "and 0 means you do not have the correct color nor position.", 
+        10, 60, 
+        Output_con::Coloration::Orange
+    );
+    preparatory::priv::center_lr(
+        help_4_mtext, 
+        "The game ends when you guess the correct code or you run out of turns.", 
+        12, 60, 
+        Output_con::Coloration::Orange
+    );
+
+    // the border
+    preparatory::priv::scanner(
+        help_34_border,
+        {"╒", "│", "╘"},
+        14, 20,
+        Output_con::Coloration::Blue
+    );
+    for (int i = 0; i <= 17; ++i) {
+        preparatory::priv::scanner(
+            help_34_border,
+            {"═", " ", "═"},
+            14, (21 + i),
+            Output_con::Coloration::Blue
+        );
+    }
+    preparatory::priv::scanner(
+        help_34_border,
+        {"╤", "│", "╧"},
+        14, 39,
+        Output_con::Coloration::Blue
+    );
+    for (int i = 0; i <= 17; ++i) {
+        preparatory::priv::scanner(
+            help_34_border,
+            {"═", " ", "═"},
+            14, (40 + i),
+            Output_con::Coloration::Blue
+        );
+    }
+    preparatory::priv::scanner(
+        help_34_border,
+        {"╕", "│", "╛"},
+        14, 58,
+        Output_con::Coloration::Blue
+    );
+}
+
+void preparatory::Help::help_screen_5l(
+    std::vector<Output_con>& help_5_mtext,
+    std::vector<Output_con>& help_5_border
+) {
+    // the text itself
+    preparatory::priv::center_lr(
+        help_5_mtext, 
+        "How do I play this version?", 
+        1, 60,
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_5_mtext, 
+        "You will be requested to enter a code of 3 characters,", 
+        3, 60,
+        Output_con::Coloration::Orange
+    );
+    preparatory::priv::center_lr(
+        help_5_mtext, 
+        "out of the 6 possible.", 
+        4, 60,
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_5_mtext, 
+        "The characters we will draw from are:", 
+        5, 60,
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::valid_color_loader(
+        help_5_mtext,
+        valid_tokens,
+        7
+    );
+    preparatory::priv::center_lr(
+        help_5_mtext, 
+        "You may be able to change these in the settings,", 
+        9, 60,
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_5_mtext, 
+        "depending on your version.", 
+        10, 60,
+        Output_con::Coloration::Naught
+    );
+    preparatory::priv::center_lr(
+        help_5_mtext, 
+        "After inputting, the board will print out with your feedback.", 
+        12, 60,
+        Output_con::Coloration::Naught
+    );
+
+    // the border
+     preparatory::priv::scanner(
+        help_34_border,
+        {"╒", "│", "╘"},
+        14, 30,
+        Output_con::Coloration::Blue
+    );
+    for (int i = 0; i <= 10; ++i) {
+        preparatory::priv::scanner(
+            help_34_border,
+            {"═", " ", "═"},
+            14, (31 + i),
+            Output_con::Coloration::Blue
+        );
+    }
+    preparatory::priv::scanner(
+        help_34_border,
+        {"╕", "│", "╛"},
+        14, 49,
+        Output_con::Coloration::Blue
+    );
 }
 
 // ==> Help Printer Functions
@@ -1149,6 +1579,133 @@ void preparatory::Help::help_screen_2p(
     WINDOW * given_win
 ) {
     preparatory::priv::wprintcon(given_win, help_2_border);
+}
+
+void preparatory::Help::help_screen_3p(
+    const std::vector<Output_con>& help_3_mtext,
+    const std::vector<Output_con>& help_34_border,
+    WINDOW * given_win
+) {
+    preparatory::priv::wprintcon(given_win, help_3_mtext);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    preparatory::priv::wprintcon(given_win, help_34_border);
+}
+
+void preparatory::Help::help_screen_4p(
+    const std::vector<Output_con>& help_4_mtext,
+    const std::vector<Output_con>& help_34_border,
+    WINDOW * given_win
+) {
+    preparatory::priv::wprintcon(given_win, help_4_mtext);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    preparatory::priv::wprintcon(given_win, help_34_border);
+}
+
+void preparatory::Help::help_screen_5p(
+    const std::vector<Output_con>& help_5_mtext,
+    const std::vector<Output_con>& help_5_border,
+    WINDOW * given_win
+) {
+    preparatory::priv::wprintcon(given_win, help_5_mtext);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    preparatory::priv::wprintcon(given_win, help_5_border);
+}
+
+void preparatory::Help::main_choice_printer(
+    Help::Help_state given_choice, 
+    std::vector<Output_con>& granvec,
+    WINDOW * given_win
+) {
+    if (given_choice == preparatory::Help::Help_state::Explain_1) {
+        preparatory::priv::center_lr(
+            granvec,
+            "<         What is Mastermind?          >",
+            6,
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::center_lr(
+            granvec,
+            "<     How do I play this version?      >",
+            8,
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::center_lr(
+            granvec,
+            "<                 Home                 >",
+            10,
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::wprintcon(given_win, granvec);
+        granvec.clear();
+    } else if (given_choice == preparatory::Help::Help_state::Refresh) {
+        preparatory::priv::center_lr(
+            granvec,
+            "<         What is Mastermind?          >",
+            6,
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::center_lr(
+            granvec,
+            "<     How do I play this version?      >",
+            8,
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::center_lr(
+            granvec,
+            "<                 Home                 >",
+            10,
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::wprintcon(given_win, granvec);
+        granvec.clear();
+    } else if (given_choice == preparatory::Help::Help_state::Title_screen) {
+        preparatory::priv::center_lr(
+            granvec,
+            "<         What is Mastermind?          >",
+            6,
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::center_lr(
+            granvec,
+            "<     How do I play this version?      >",
+            8,
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::center_lr(
+            granvec,
+            "<                 Home                 >",
+            10,
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::wprintcon(given_win, granvec);
+        granvec.clear();
+    } else {
+        error ("Absurd implementation of home screen choice");
+    }
 }
 
 // ==> Auxiliary Functions
@@ -1276,6 +1833,30 @@ void preparatory::priv::center_lr(
         if (i == len-1) {
             std::this_thread::sleep_for(std::chrono::milliseconds(lastwait));
             return;
+        }
+    }
+}
+
+void preparatory::priv::center_lr(
+    std::vector <Output_con>& granvec, 
+    std::string outstr, 
+    int y_dimu, 
+    Output_con::Coloration col,
+    Output_con::Attribute attri,
+    bool will_return
+) {
+    int len = outstr.length();
+    // Distance from side
+    int dis = 39 - static_cast<int>(floor(len/2.0));
+    for (int i = 0; i < len; ++i) {
+        std::string s(1, outstr[i]);
+        if ((i == len-1) && (will_return == false)) {
+            granvec.push_back(Output_con(s, y_dimu, (dis + i), 0, true, col, attri));
+            return;
+        } else if (will_return == false) {
+            granvec.push_back(Output_con(s, y_dimu, (dis + i), 0, false, col, attri));
+        } else if (will_return == true) {
+            granvec.push_back(Output_con(s, y_dimu, (dis + i), 30, true, col, attri));
         }
     }
 }
