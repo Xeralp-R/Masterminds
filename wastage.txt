@@ -110,3 +110,29 @@ preparatory::priv::scanner(help_1_text, {"╷", "├", "╵"}, 2, 28, Output_con
     preparatory::priv::scanner(help_1_text, {" ", " ", "─"}, 2, 44, Output_con::Coloration::Red);
     preparatory::priv::scanner(help_1_text, {" ", " ", "╴"}, 2, 45, Output_con::Coloration::Red);
     preparatory::priv::scanner(help_1_text, {" ", " ", " "}, 2, 46, Output_con::Coloration::Red);
+
+    for (int c = 1; c < 8; c++){
+        cout << endl << "------------------------------" << endl;
+        cout << "|    " << c << " | " << guess[c-1][0] << " " << guess[c-1][1] << " " << guess[c-1][2] << " ";
+        cout << "   | " << validity[c-1][0] << " " << validity[c-1][1] << " " << validity[c-1][2] << "    |" << endl;
+    }
+    cout << "------------------------------" << endl << endl;
+
+    do {
+        cout << "Choices (R,O,Y,G,B,V)" << endl;
+        cout << "Enter Your Three Guesses:";
+
+        cin >> guess[row][0] >> guess[row][1] >> guess[row][2];
+
+        // checks if input is part of the choices (R,O,Y,B,G,V)
+        bool truOne, truTwo, truThr;
+        truOne = choiceCheck(guess[row][0], choiceClr);
+        truTwo = choiceCheck(guess[row][1], choiceClr);
+        truThr = choiceCheck(guess[row][2], choiceClr);
+        if (!truOne || !truTwo || !truThr) {
+            cout << "Your guess is invalid, please try again." << endl;
+            will_run_again = true;
+        } else {
+            will_run_again = false;
+        }
+    } while (will_run_again);

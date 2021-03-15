@@ -592,6 +592,9 @@ void preparatory::begin_ncurses () {
 
     // let's get our arrow keys
     keypad(stdscr, true);
+
+    // make the cursor invisible
+    curs_set(0);
 }
 
 void preparatory::end_ncurses () {
