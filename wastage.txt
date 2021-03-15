@@ -136,3 +136,42 @@ preparatory::priv::scanner(help_1_text, {"╷", "├", "╵"}, 2, 28, Output_con
             will_run_again = false;
         }
     } while (will_run_again);
+
+    /*
+void primary::game_screen_1l(
+    std::vector<Output_con>& game_1_border
+) {
+    for (int i = 1; i <= 78; ++i) {
+        game_1_border.push_back(Output_con("━", 0, i, 0, false));
+        game_1_border.push_back(Output_con("━", 23, i, 0, false));
+    }
+    for (int i = 1; i <= 22; ++i) {
+        game_1_border.push_back(Output_con("┃", i, 0, 0, false));
+        game_1_border.push_back(Output_con("┃", i, 79, 0, false));
+    }
+    game_1_border.push_back(Output_con("┏", 0, 0, 0, false));
+    game_1_border.push_back(Output_con("┓", 0, 79, 0, false));
+    game_1_border.push_back(Output_con("┗", 23, 0, 0, false));
+    game_1_border.push_back(Output_con("┛", 23, 79, 0, true));
+} */
+
+/*
+void primary::game_screen_1p(
+    std::vector<Output_con>& game_1_border
+) {
+    preparatory::priv::printcon(game_1_border);
+
+    game_1_border.clear();
+}*/
+
+
+// loads the border
+/*
+void game_screen_1l(
+    std::vector<Output_con>& game_1_border
+);
+
+// prints and clear the border
+void game_screen_1p(
+    std::vector<Output_con>& game_1_border
+);*/

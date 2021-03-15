@@ -15,23 +15,9 @@ void overarch();
 namespace primary {
     // the state that will declare whether we are in the 1st, second, or 3rd character
     enum class Input_state {
-        Input_1st, // we are inputting the 1st character
-        Input_2nd, // we are imputting the 2nd char
-        Input_3rd, // we are inputting the 3rd char
-        Return, // we are expecting a enter key
-        Passant // go to calculation
+        Play_again,
+        Go_Out
     };
-
-    // loads the border
-    /*
-    void game_screen_1l(
-        std::vector<Output_con>& game_1_border
-    );
-
-    // prints and clear the border
-    void game_screen_1p(
-        std::vector<Output_con>& game_1_border
-    );*/
 
     // loads the table of values
     void game_screen_2l(
@@ -67,18 +53,47 @@ namespace primary {
         WINDOW * given_win
     );
 
+    // load the victory screeen
+    void game_screen_4l(
+        std::vector <Output_con>& game_4_subtitle,
+        std::vector <Output_con>& game_4_border,
+        std::vector <Output_con>& game_4_bigtext,
+        std::vector <Output_con>& game_4_ornaments,
+        std::vector <Output_con>& game_4_mtext,
+        std::vector <Output_con>& game_4_sbord
+    );
+
+    //print the victory screen
+    void game_screen_4p(
+        std::vector <Output_con>& game_4_subtitle,
+        std::vector <Output_con>& game_4_border,
+        std::vector <Output_con>& game_4_bigtext,
+        std::vector <Output_con>& game_4_ornaments,
+        std::vector <Output_con>& game_4_mtext,
+        std::vector <Output_con>& game_4_sbord
+    );
+
     std::vector<Output_con> game_1_border {};
     std::vector<Output_con> game_2_subtitle {};
     std::vector<Output_con> game_2_table {};
     std::vector<Output_con> game_3_subtitle {};
     std::vector<Output_con> game_3_border {};
     std::vector<Output_con> game_3_text {};
+    std::vector <Output_con> game_4_subtitle {};
+    std::vector <Output_con> game_4_border {};
+    std::vector <Output_con> game_4_bigtext {};
+    std::vector <Output_con> game_4_ornaments {};
+    std::vector <Output_con> game_4_mtext {};
+    std::vector <Output_con> game_4_sbord {};
+    std::vector <Output_con> game_4_stext {};
 
     // act as the sorter
     void arrsortstr( std::vector< std::vector<std::string> >& arr );
 
     // create an outputcon for the table's roygbv
     Output_con token_placer(string str, int y_dimu, int x_dimu);
+
+    void game_choice_printer_1(primary::Input_state given_choice, std::vector<Output_con>& granvec);
 };
 
 /*
@@ -255,17 +270,19 @@ void result(int row) {
         primary::arrsortstr(validity);
 }
 
-bool victory () {
+bool is_victory () {
     for (int i = 0; i < 7; ++i) 
     {
         if ((guess[i][0] == color[0]) && (guess[i][1] == color[1]) && (guess[i][2] == color[2]))
         {
-            cout << "VICTORY ROYALE!!!" << endl;
+            //cout << "VICTORY ROYALE!!!" << endl;
             return true;
         }
     }
     return false;
 }
+
+bool act_victory ();
 
 int main (int argc, char* argv[]) {
     try {
@@ -290,6 +307,7 @@ void overarch() {
     preparatory::startup();
     */
     preparatory::begin_ncurses();
+    /*
     WINDOW * Board;
     Board = newwin(17, 80, 0, 0);
     WINDOW * Text;
@@ -303,14 +321,16 @@ void overarch() {
         coutput(Board, Text);
         cinput(i, Text);
         result(i);
-        //given_out = victory();
-        //if (given_out == true) {
-        //    break;
-        //}
+        given_out = is_victory();
+        if (given_out == true) {
+            break;
+        }
     }
 
     delwin(Board);
     delwin(Text);
+*/
+    act_victory();
 
     preparatory::end_ncurses();
 }
@@ -319,24 +339,67 @@ void overarch() {
  * Everything after this line was primarily developed by rex
 */
 
+// ==> Primary Functions
+
+bool act_victory () {
+    primary::game_screen_4l(
+        primary::game_4_subtitle,
+        primary::game_4_border,
+        primary::game_4_bigtext,
+        primary::game_4_ornaments,
+        primary::game_4_mtext,
+        primary::game_4_sbord
+    );
+
+    primary::game_screen_4p(
+        primary::game_4_subtitle,
+        primary::game_4_border,
+        primary::game_4_bigtext,
+        primary::game_4_ornaments,
+        primary::game_4_mtext,
+        primary::game_4_sbord
+    );
+
+    // prepare the default game state
+    primary::Input_state given_game_choice_1 = primary::Input_state::Play_again;
+
+    // make out that first change
+    primary::game_choice_printer_1(given_game_choice_1, primary::game_4_stext);
+
+    // initilize the input char
+    int given_game_switcher_1 = 0;
+
+    // whether the person has made a choice yet
+    bool game_got_in_1 = false;
+
+    while (!game_got_in_1) {
+        given_game_switcher_1 = getch();
+
+        switch(given_game_switcher_1) {
+            case KEY_RIGHT:
+            case KEY_LEFT:
+                if (given_game_choice_1 == primary::Input_state::Play_again){
+                    given_game_choice_1 = primary::Input_state::Go_Out;
+                } else if (given_game_choice_1 == primary::Input_state::Go_Out) {
+                    given_game_choice_1 = primary::Input_state::Play_again;
+                }
+
+                primary::game_choice_printer_1(given_game_choice_1, primary::game_4_stext);
+                break;
+            case 10:
+                game_got_in_1 = true;
+                break;
+        }
+    }
+
+    if (given_game_choice_1 == primary::Input_state::Play_again) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 // ==> Loaders
-/*
-void primary::game_screen_1l(
-    std::vector<Output_con>& game_1_border
-) {
-    for (int i = 1; i <= 78; ++i) {
-        game_1_border.push_back(Output_con("━", 0, i, 0, false));
-        game_1_border.push_back(Output_con("━", 23, i, 0, false));
-    }
-    for (int i = 1; i <= 22; ++i) {
-        game_1_border.push_back(Output_con("┃", i, 0, 0, false));
-        game_1_border.push_back(Output_con("┃", i, 79, 0, false));
-    }
-    game_1_border.push_back(Output_con("┏", 0, 0, 0, false));
-    game_1_border.push_back(Output_con("┓", 0, 79, 0, false));
-    game_1_border.push_back(Output_con("┗", 23, 0, 0, false));
-    game_1_border.push_back(Output_con("┛", 23, 79, 0, true));
-} */
 
 void primary::game_screen_2l(
     std::vector<Output_con>& game_2_subtitle,
@@ -511,15 +574,332 @@ void primary::game_screen_3la(
     preparatory::priv::scanner(game_3_border, {"╖", "║", "╜"}, 3, 48);
 }
 
-// ==> Printers
-/*
-void primary::game_screen_1p(
-    std::vector<Output_con>& game_1_border
+void primary::game_screen_4l(
+    std::vector <Output_con>& game_4_subtitle,
+    std::vector <Output_con>& game_4_border,
+    std::vector <Output_con>& game_4_bigtext,
+    std::vector <Output_con>& game_4_ornaments,
+    std::vector <Output_con>& game_4_mtext,
+    std::vector <Output_con>& game_4_sbord
 ) {
-    preparatory::priv::printcon(game_1_border);
+    // subtitle
+    preparatory::priv::center_lr(
+        game_4_subtitle, 
+        "Oh my, it looks like the code has been guessed!", 
+        1, 60
+    );
+    preparatory::priv::center_lr(
+        game_4_subtitle, 
+        ("The code was, in fact, "+color[0]+color[1]+color[2]+","),
+        2, 60
+    );
+    preparatory::priv::center_lr(
+        game_4_subtitle,
+        "and thus, we can safely declare...",
+        3, 1000
+    );
 
-    game_1_border.clear();
-}*/
+    // border,outer
+    // Top side, border
+    for (int i = 0; i <= 39; ++i) {
+        game_4_border.push_back(Output_con("━", 8, (39 + i), 15, false, Output_con::Coloration::Yellow));
+        game_4_border.push_back(Output_con("━", 8, (40 - i), 15, true, Output_con::Coloration::Yellow));
+    }
+    // Top corners, border
+    game_4_border.push_back(Output_con("┏", 8, 0, 15, false, Output_con::Coloration::Yellow));
+    game_4_border.push_back(Output_con("┓", 8, 79, 15, true, Output_con::Coloration::Yellow));
+    // Sides, border
+    // Will try a 60 millisecond delay– will that work better?
+    for (int i = 0; i <= 4; ++i) {
+        game_4_border.push_back(Output_con("┃", (9 + i), 0, 15, false, Output_con::Coloration::Yellow));
+        game_4_border.push_back(Output_con("┃", (9 + i), 79, 15, true, Output_con::Coloration::Yellow));
+    }
+    // Bottom corners, border
+    game_4_border.push_back(Output_con("┗", 14, 0, 15, false, Output_con::Coloration::Yellow));
+    game_4_border.push_back(Output_con("┛", 14, 79, 15, true, Output_con::Coloration::Yellow));
+    // Bottom side, border
+    for (int i = 39; i >= 0; --i) {
+        game_4_border.push_back(Output_con("━", 14, (39 + i), 15, false, Output_con::Coloration::Yellow));
+        game_4_border.push_back(Output_con("━", 14, (40 - i), 15, true, Output_con::Coloration::Yellow));
+    }
+
+    // border, inner
+    // Top side, border
+    for (int i = 0; i <= 37; ++i) {
+        game_4_border.push_back(Output_con("═", 13, (39 + i), 15, false, Output_con::Coloration::Violet));
+        game_4_border.push_back(Output_con("═", 13, (40 - i), 15, true, Output_con::Coloration::Violet));
+    }
+    // Bottom corners, border
+    game_4_border.push_back(Output_con("╚", 13, 2, 15, false, Output_con::Coloration::Violet));
+    game_4_border.push_back(Output_con("╝", 13, 77, 15, true, Output_con::Coloration::Violet));
+    // Sides, border
+    // Will try a 60 millisecond delay– will that work better?
+    for (int i = 2; i >= 0; --i) {
+        game_4_border.push_back(Output_con("║", (10 + i), 2, 15, false, Output_con::Coloration::Violet));
+        game_4_border.push_back(Output_con("║", (10 + i), 77, 15, true, Output_con::Coloration::Violet));
+    }
+    // Top corners, border
+    game_4_border.push_back(Output_con("╔", 9, 2, 15, false, Output_con::Coloration::Violet));
+    game_4_border.push_back(Output_con("╗", 9, 77, 15, true, Output_con::Coloration::Violet));
+    // Bottom side, border
+    for (int i = 37; i >= 0; --i) {
+        game_4_border.push_back(Output_con("═", 9, (39 + i), 15, false, Output_con::Coloration::Violet));
+        game_4_border.push_back(Output_con("═", 9, (40 - i), 15, true, Output_con::Coloration::Violet));
+    }
+
+    // the big text that says victory
+    preparatory::alpha::letter_v(game_4_bigtext, 10, 19, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_i(game_4_bigtext, 10, 26, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_c(game_4_bigtext, 10, 32, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_t(game_4_bigtext, 10, 38, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_o(game_4_bigtext, 10, 44, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_r(game_4_bigtext, 10, 50, Output_con::Coloration::Yellow);
+    preparatory::alpha::letter_y(game_4_bigtext, 10, 56, Output_con::Coloration::Yellow);
+
+    // ornamentation, top row
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, 0);
+    for (int i = 1, j = 1; i <= 6 && j <= 62; ++i, j += 12) {
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j);
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+1);
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+2);
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+3);
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+4);
+        if (i == 1) {
+            game_4_ornaments.push_back(Output_con("*", 5, j+5, 10, false, Output_con::Coloration::Red));
+            game_4_ornaments.push_back(Output_con("✠", 6, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 7, j+5, 10, true, Output_con::Coloration::Red));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+7);
+            game_4_ornaments.push_back(Output_con("✠", 5, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 6, j+8, 10, false, Output_con::Coloration::Red));
+            game_4_ornaments.push_back(Output_con("✠", 7, j+8, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+10);
+            game_4_ornaments.push_back(Output_con("*", 5, j+11, 10, false, Output_con::Coloration::Red));
+            game_4_ornaments.push_back(Output_con("✠", 6, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 7, j+11, 10, true, Output_con::Coloration::Red));
+        } else if (i == 2) {
+            game_4_ornaments.push_back(Output_con("✠", 5, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 6, j+5, 10, false, Output_con::Coloration::Orange));
+            game_4_ornaments.push_back(Output_con("✠", 7, j+5, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+7);
+            game_4_ornaments.push_back(Output_con("*", 5, j+8, 10, false, Output_con::Coloration::Orange));
+            game_4_ornaments.push_back(Output_con("✠", 6, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 7, j+8, 10, true, Output_con::Coloration::Orange));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+10);
+            game_4_ornaments.push_back(Output_con("✠", 5, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 6, j+11, 10, false, Output_con::Coloration::Orange));
+            game_4_ornaments.push_back(Output_con("✠", 7, j+11, 10, true, Output_con::Coloration::Naught));
+        } else if (i == 3) {
+            game_4_ornaments.push_back(Output_con("*", 5, j+5, 10, false, Output_con::Coloration::Yellow));
+            game_4_ornaments.push_back(Output_con("✠", 6, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 7, j+5, 10, true, Output_con::Coloration::Yellow));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+7);
+            game_4_ornaments.push_back(Output_con("✠", 5, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 6, j+8, 10, false, Output_con::Coloration::Yellow));
+            game_4_ornaments.push_back(Output_con("✠", 7, j+8, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+10);
+            game_4_ornaments.push_back(Output_con("*", 5, j+11, 10, false, Output_con::Coloration::Yellow));
+            game_4_ornaments.push_back(Output_con("✠", 6, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 7, j+11, 10, true, Output_con::Coloration::Yellow));
+        } else if (i == 4) {
+            game_4_ornaments.push_back(Output_con("✠", 5, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 6, j+5, 10, false, Output_con::Coloration::Green));
+            game_4_ornaments.push_back(Output_con("✠", 7, j+5, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+7);
+            game_4_ornaments.push_back(Output_con("*", 5, j+8, 10, false, Output_con::Coloration::Green));
+            game_4_ornaments.push_back(Output_con("✠", 6, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 7, j+8, 10, true, Output_con::Coloration::Green));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+10);
+            game_4_ornaments.push_back(Output_con("✠", 5, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 6, j+11, 10, false, Output_con::Coloration::Green));
+            game_4_ornaments.push_back(Output_con("✠", 7, j+11, 10, true, Output_con::Coloration::Naught));
+        } else if (i == 5) {
+            game_4_ornaments.push_back(Output_con("*", 5, j+5, 10, false, Output_con::Coloration::Blue));
+            game_4_ornaments.push_back(Output_con("✠", 6, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 7, j+5, 10, true, Output_con::Coloration::Blue));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+7);
+            game_4_ornaments.push_back(Output_con("✠", 5, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 6, j+8, 10, false, Output_con::Coloration::Blue));
+            game_4_ornaments.push_back(Output_con("✠", 7, j+8, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+10);
+            game_4_ornaments.push_back(Output_con("*", 5, j+11, 10, false, Output_con::Coloration::Blue));
+            game_4_ornaments.push_back(Output_con("✠", 6, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 7, j+11, 10, true, Output_con::Coloration::Blue));
+        } else {
+            game_4_ornaments.push_back(Output_con("✠", 5, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 6, j+5, 10, false, Output_con::Coloration::Violet));
+            game_4_ornaments.push_back(Output_con("✠", 7, j+5, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+7);
+            game_4_ornaments.push_back(Output_con("*", 5, j+8, 10, false, Output_con::Coloration::Violet));
+            game_4_ornaments.push_back(Output_con("✠", 6, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 7, j+8, 10, true, Output_con::Coloration::Violet));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, j+10);
+            game_4_ornaments.push_back(Output_con("✠", 5, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 6, j+11, 10, false, Output_con::Coloration::Violet));
+            game_4_ornaments.push_back(Output_con("✠", 7, j+11, 10, true, Output_con::Coloration::Naught));
+        }
+    }
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, 73);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, 74);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, 75);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, 76);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, 77);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, 78);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 5, 79);
+
+    // ornamentation, bottom row
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, 0);
+    for (int i = 1, j = 1; i <= 6 && j <= 62; ++i, j += 12) {
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j);
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+1);
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+2);
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+3);
+        preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+4);
+        if (i == 1) {
+            game_4_ornaments.push_back(Output_con("✠", 15, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 16, j+5, 10, false, Output_con::Coloration::Red));
+            game_4_ornaments.push_back(Output_con("✠", 17, j+5, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+7);
+            game_4_ornaments.push_back(Output_con("*", 15, j+8, 10, false, Output_con::Coloration::Red));
+            game_4_ornaments.push_back(Output_con("✠", 16, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 17, j+8, 10, true, Output_con::Coloration::Red));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+10);
+            game_4_ornaments.push_back(Output_con("✠", 15, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 16, j+11, 10, false, Output_con::Coloration::Red));
+            game_4_ornaments.push_back(Output_con("✠", 17, j+11, 10, true, Output_con::Coloration::Naught));
+        } else if (i == 2) {
+            game_4_ornaments.push_back(Output_con("*", 15, j+5, 10, false, Output_con::Coloration::Orange));
+            game_4_ornaments.push_back(Output_con("✠", 16, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 17, j+5, 10, true, Output_con::Coloration::Orange));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+7);
+            game_4_ornaments.push_back(Output_con("✠", 15, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 16, j+8, 10, false, Output_con::Coloration::Orange));
+            game_4_ornaments.push_back(Output_con("✠", 17, j+8, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+10);
+            game_4_ornaments.push_back(Output_con("*", 15, j+11, 10, false, Output_con::Coloration::Orange));
+            game_4_ornaments.push_back(Output_con("✠", 16, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 17, j+11, 10, true, Output_con::Coloration::Orange));
+        } else if (i == 3) {
+            game_4_ornaments.push_back(Output_con("✠", 15, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 16, j+5, 10, false, Output_con::Coloration::Yellow));
+            game_4_ornaments.push_back(Output_con("✠", 17, j+5, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+7);
+            game_4_ornaments.push_back(Output_con("*", 15, j+8, 10, false, Output_con::Coloration::Yellow));
+            game_4_ornaments.push_back(Output_con("✠", 16, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 17, j+8, 10, true, Output_con::Coloration::Yellow));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+10);
+            game_4_ornaments.push_back(Output_con("✠", 15, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 16, j+11, 10, false, Output_con::Coloration::Yellow));
+            game_4_ornaments.push_back(Output_con("✠", 17, j+11, 10, true, Output_con::Coloration::Naught));
+        } else if (i == 4) {
+            game_4_ornaments.push_back(Output_con("*", 15, j+5, 10, false, Output_con::Coloration::Green));
+            game_4_ornaments.push_back(Output_con("✠", 16, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 17, j+5, 10, true, Output_con::Coloration::Green));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+7);
+            game_4_ornaments.push_back(Output_con("✠", 15, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 16, j+8, 10, false, Output_con::Coloration::Green));
+            game_4_ornaments.push_back(Output_con("✠", 17, j+8, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+10);
+            game_4_ornaments.push_back(Output_con("*", 15, j+11, 10, false, Output_con::Coloration::Green));
+            game_4_ornaments.push_back(Output_con("✠", 16, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 17, j+11, 10, true, Output_con::Coloration::Green));
+        } else if (i == 5) {
+            game_4_ornaments.push_back(Output_con("✠", 15, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 16, j+5, 10, false, Output_con::Coloration::Blue));
+            game_4_ornaments.push_back(Output_con("✠", 17, j+5, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+7);
+            game_4_ornaments.push_back(Output_con("*", 15, j+8, 10, false, Output_con::Coloration::Blue));
+            game_4_ornaments.push_back(Output_con("✠", 16, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 17, j+8, 10, true, Output_con::Coloration::Blue));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+10);
+            game_4_ornaments.push_back(Output_con("✠", 15, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 16, j+11, 10, false, Output_con::Coloration::Blue));
+            game_4_ornaments.push_back(Output_con("✠", 17, j+11, 10, true, Output_con::Coloration::Naught));
+        } else {
+            game_4_ornaments.push_back(Output_con("*", 15, j+5, 10, false, Output_con::Coloration::Violet));
+            game_4_ornaments.push_back(Output_con("✠", 16, j+5, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 17, j+5, 10, true, Output_con::Coloration::Violet));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+6);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+7);
+            game_4_ornaments.push_back(Output_con("✠", 15, j+8, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 16, j+8, 10, false, Output_con::Coloration::Violet));
+            game_4_ornaments.push_back(Output_con("✠", 17, j+8, 10, true, Output_con::Coloration::Naught));
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+9);
+            preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, j+10);
+            game_4_ornaments.push_back(Output_con("*", 15, j+11, 10, false, Output_con::Coloration::Violet));
+            game_4_ornaments.push_back(Output_con("✠", 16, j+11, 10, false, Output_con::Coloration::Naught));
+            game_4_ornaments.push_back(Output_con("*", 17, j+11, 10, true, Output_con::Coloration::Violet));
+        }
+    }
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, 73);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, 74);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, 75);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, 76);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, 77);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, 78);
+    preparatory::priv::scanner(game_4_ornaments, {" ", " ", " "}, 15, 79);
+
+    // the main text
+    preparatory::priv::center_lr(game_4_mtext, "Would you like to play again?", 19, 60);
+    // the border
+    preparatory::priv::scanner(
+        game_4_sbord,
+        {"╒", "│", "╘"},
+        20, 20,
+        Output_con::Coloration::Naught
+    );
+    for (int i = 0; i <= 17; ++i) {
+        preparatory::priv::scanner(
+            game_4_sbord,
+            {"═", " ", "═"},
+            20, (21 + i),
+            Output_con::Coloration::Naught
+        );
+    }
+    preparatory::priv::scanner(
+        game_4_sbord,
+        {"╤", "│", "╧"},
+        20, 39,
+        Output_con::Coloration::Naught
+    );
+    for (int i = 0; i <= 17; ++i) {
+        preparatory::priv::scanner(
+            game_4_sbord,
+            {"═", " ", "═"},
+            20, (40 + i),
+            Output_con::Coloration::Naught
+        );
+    }
+    preparatory::priv::scanner(
+        game_4_sbord,
+        {"╕", "│", "╛"},
+        20, 58,
+        Output_con::Coloration::Naught
+    );
+}
+
+// ==> Printers
 
 void primary::game_screen_2p(
     std::vector<Output_con>& game_2_subtitle,
@@ -549,6 +929,81 @@ void primary::game_screen_3p(
 
     game_3_subtitle.clear();
     game_3_border.clear();
+}
+
+void primary::game_screen_4p(
+    std::vector <Output_con>& game_4_subtitle,
+    std::vector <Output_con>& game_4_border,
+    std::vector <Output_con>& game_4_bigtext,
+    std::vector <Output_con>& game_4_ornaments,
+    std::vector <Output_con>& game_4_mtext,
+    std::vector <Output_con>& game_4_sbord
+) {
+    preparatory::priv::printcon(game_4_subtitle);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    preparatory::priv::printcon(game_4_border);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    preparatory::priv::printcon(game_4_bigtext);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    preparatory::priv::printcon(game_4_ornaments);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    preparatory::priv::printcon(game_4_mtext);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    preparatory::priv::printcon(game_4_sbord);
+
+    game_4_subtitle.clear();
+    game_4_border.clear();
+    game_4_bigtext.clear();
+    game_4_ornaments.clear();
+    game_4_mtext.clear();
+    game_4_sbord.clear();
+}
+
+void primary::game_choice_printer_1(
+    primary::Input_state given_choice, 
+    std::vector<Output_con>& granvec
+) {
+    if (given_choice == primary::Input_state::Play_again) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Yes",
+            22, 28, // 29?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "No",
+            22, 48, // 49?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::printcon(granvec);
+        granvec.clear();
+    } else if (given_choice == primary::Input_state::Go_Out) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Yes",
+            22, 28, // 29?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "No",
+            22, 48, // 49?
+            Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::printcon(granvec);
+        granvec.clear();
+    } else {
+        error("Absurd victory choice given");
+    }
 }
 
 // ==> Others
