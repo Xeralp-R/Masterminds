@@ -153,6 +153,9 @@ namespace preparatory {
             // Prints the title screen and accept the inputs given to it.
             preparatory::Title::Title_state title_screen_print();
 
+            // clears out all the variables for another loading.
+            void title_screen_clear();
+
             // Loads the title itself.
             void title_screen_1l(
                 std::vector<Output_con>& title_1_bord_1, 
@@ -183,7 +186,8 @@ namespace preparatory {
             void title_screen_3l(
                 std::vector<Output_con>& title_3_subtitle,
                 std::vector<Output_con>& title_3_border,
-                std::vector<Output_con>& title_3_text
+                std::vector<Output_con>& title_3_text,
+                std::vector<std::string> valid_tokens
             );
 
             // Prints the current settings.
@@ -374,6 +378,23 @@ namespace preparatory {
                 std::vector<Output_con>& granvec,
                 WINDOW * given_win
             );
+    };
+
+    // Settings Class
+    class Settings {
+        public:
+            // load the vectors
+            void settings_screen_load();
+
+            // interface with the public
+            void settings_screen_inter();
+
+            // clear the vectors
+            void settings_screen_clear();
+        private:
+            // the text and border for the single screen
+            std::vector<Output_con> settings_1_text {};
+            std::vector<Output_con> settings_1_sbord {};
     };
 
     // All of the private data that needs to be kept away from mastermind.
@@ -645,6 +666,9 @@ void preparatory::startup() {
 
     while (!game_passant) {
         if (titular_state == preparatory::Title::Title_state::Help) {
+            // clear the standard screen
+            wclear(stdscr);
+
             // prepare the help screen
             preparatory::Help Game_Help;
 
@@ -657,8 +681,21 @@ void preparatory::startup() {
             // destroy all variables in preparation for another run
             Game_Help.preparatory::Help::help_screen_clear();
         } else if (titular_state == preparatory::Title::Title_state::Settings) {
-            // The settings screen
+
+            // instantiate the settings screen
+            preparatory::Settings Game_Settings;
+
+            // load the settings screen
+            Game_Settings.preparatory::Settings::settings_screen_load();
+
+            // interface with the settings screen
+            Game_Settings.preparatory::Settings::settings_screen_inter();
+
+            // destroy everything settings-related for another run
+            Game_Settings.preparatory::Settings::settings_screen_clear();
         } else if (titular_state == preparatory::Title::Title_state::Play) {
+            // clear the title screen
+            wclear(stdscr);
             game_passant = true;
             return;
             //break;
@@ -666,6 +703,13 @@ void preparatory::startup() {
         if (game_passant == false) {
             // clear the standard screen
             wclear(stdscr);
+
+            // clear the title variables
+            Game_Title.preparatory::Title::title_screen_clear();
+
+            // reload the variables
+            Game_Title.preparatory::Title::title_screen_load();
+
             // print the title screen again
             titular_state = Game_Title.preparatory::Title::title_screen_print();
         }
@@ -693,7 +737,8 @@ void preparatory::Title::title_screen_load() {
     preparatory::Title::title_screen_3l(
         preparatory::Title::title_3_subtitle,
         preparatory::Title::title_3_border,
-        preparatory::Title::title_3_text
+        preparatory::Title::title_3_text,
+        valid_tokens
     );
 
     // The switching option
@@ -787,6 +832,20 @@ preparatory::Title::Title_state preparatory::Title::title_screen_print() {
 	//refresh();
 	//getch();
     //curs_set(1);
+}
+
+void preparatory::Title::title_screen_clear() {
+    this->title_1_bord_1.clear();
+    this->title_1_bord_2.clear();
+    this->title_1_text.clear();
+    this->title_2_border.clear();
+    this->title_2_text.clear();
+    this->title_3_border.clear();
+    this->title_3_subtitle.clear();
+    this->title_3_text.clear();
+    this->title_4_border.clear();
+    this->title_4_subtitle.clear();
+    this->title_4_text.clear();
 }
 
 // ==> Loaders
@@ -908,7 +967,8 @@ void preparatory::Title::title_screen_2l(
 void preparatory::Title::title_screen_3l (
     std::vector<Output_con>& title_3_subtitle,
     std::vector<Output_con>& title_3_border,
-    std::vector<Output_con>& title_3_text
+    std::vector<Output_con>& title_3_text,
+    std::vector<std::string> valid_tokens
 ) {
     // The subtitle, "current settings"
     preparatory::priv::center_lr(title_3_subtitle, "Current Settings:", 15, 120);
@@ -1986,6 +2046,99 @@ void preparatory::Help::help_choice_printer_2(
         error("Absurd implementation of 2nd explain screen");
         EXIT_FAILURE;
     }
+}
+
+// ==> Settings Screen Functions 
+
+void preparatory::Settings::settings_screen_load () {
+    wclear(stdscr);
+
+    preparatory::priv::center_lr(
+        this->settings_1_text, 
+        "As of the current version, you only have 1 option to change.",
+        6, 60
+    );
+    preparatory::priv::center_lr(
+        this->settings_1_text,
+        "You are permitted to change the 6 characters",
+        7, 60
+    );
+    preparatory::priv::center_lr(
+        this->settings_1_text,
+        "you will use for the game.",
+        8, 500
+    );
+    preparatory::priv::center_lr(
+        this->settings_1_text,
+        "Type those 6 chars in, without spaces and without the percent sign.",
+        10, 60
+    );
+    preparatory::priv::center_lr(
+        this->settings_1_text,
+        "Colors will be automatically assigned appropriately.",
+        11, 60
+    );
+    preparatory::priv::center_lr(
+        this->settings_1_text,
+        "THIS PROCESS IS UNCHECKED FOR ERRORS– BE VERY CAREFUL.",
+        12, 500
+    );
+    preparatory::priv::scanner(
+        this->settings_1_sbord,
+        {"╒", "│", "╘"},
+        13, 20
+    );
+    for (int i = 21; i <= 57; ++i) {
+        preparatory::priv::scanner(
+            this->settings_1_sbord,
+            {"═", " ", "═"},
+            13, i
+        );
+    }
+    preparatory::priv::scanner(
+        this->settings_1_sbord,
+        {"╕", "│", "╛"},
+        13, 58
+    );
+}
+
+void preparatory::Settings::settings_screen_inter () {
+    wclear(stdscr);
+    preparatory::priv::printcon(this->settings_1_text);
+    preparatory::priv::printcon(this->settings_1_sbord);
+    move(14, 36);
+    // prepare to input
+    curs_set(1);
+    echo();
+    nocbreak();
+    // declare the place string goes into
+    char given_tokens [10];
+    // get the string in here
+    getstr(given_tokens);
+    // split into component chars
+    char token_0 = given_tokens[0];
+    char token_1 = given_tokens[1];
+    char token_2 = given_tokens[2];
+    char token_3 = given_tokens[3];
+    char token_4 = given_tokens[4];
+    char token_5 = given_tokens[5];
+    valid_tokens = {
+        std::string(1, token_0),
+        std::string(1, token_1),
+        std::string(1, token_2),
+        std::string(1, token_3),
+        std::string(1, token_4),
+        std::string(1, token_5)
+    };
+    // get back into regular mode
+    cbreak();
+    noecho();
+    curs_set(0);
+}
+
+void preparatory::Settings::settings_screen_clear () {
+    this->settings_1_sbord.clear();
+    this->settings_1_text.clear();
 }
 
 // ==> Auxiliary Functions

@@ -73,12 +73,24 @@ namespace primary {
         std::vector <Output_con>& game_4_sbord
     );
 
-    std::vector<Output_con> game_1_border {};
-    std::vector<Output_con> game_2_subtitle {};
-    std::vector<Output_con> game_2_table {};
-    std::vector<Output_con> game_3_subtitle {};
-    std::vector<Output_con> game_3_border {};
-    std::vector<Output_con> game_3_text {};
+    // load the fail screen
+    void game_screen_5l(
+        std::vector <Output_con>& game_5_mtext,
+        std::vector <Output_con>& game_5_border
+    );
+
+    // load the print screen
+    void game_screen_5p(
+        std::vector <Output_con>& game_5_mtext,
+        std::vector <Output_con>& game_5_border
+    );
+
+    std::vector <Output_con> game_1_border {};
+    std::vector <Output_con> game_2_subtitle {};
+    std::vector <Output_con> game_2_table {};
+    std::vector <Output_con> game_3_subtitle {};
+    std::vector <Output_con> game_3_border {};
+    std::vector <Output_con> game_3_text {};
     std::vector <Output_con> game_4_subtitle {};
     std::vector <Output_con> game_4_border {};
     std::vector <Output_con> game_4_bigtext {};
@@ -86,6 +98,9 @@ namespace primary {
     std::vector <Output_con> game_4_mtext {};
     std::vector <Output_con> game_4_sbord {};
     std::vector <Output_con> game_4_stext {};
+    std::vector <Output_con> game_5_mtext {};
+    std::vector <Output_con> game_5_border {};
+    std::vector <Output_con> game_5_stext {};
 
     // act as the sorter
     void arrsortstr( std::vector< std::vector<std::string> >& arr );
@@ -94,6 +109,11 @@ namespace primary {
     Output_con token_placer(string str, int y_dimu, int x_dimu);
 
     void game_choice_printer_1(primary::Input_state given_choice, std::vector<Output_con>& granvec);
+
+    void game_choice_printer_2(
+        primary::Input_state given_choice, 
+        std::vector<Output_con>& granvec
+    );
 };
 
 /*
@@ -101,7 +121,11 @@ namespace primary {
 */
 
 // an array containing all valid choices of color
-char choiceClr[6] = {'R', 'O', 'Y', 'G', 'B', 'V'};
+//char choiceClr[6] = {'R', 'O', 'Y', 'G', 'B', 'V'};
+char choiceClr[6] = {
+    valid_tokens[0][0], valid_tokens[1][0], valid_tokens[2][0], 
+    valid_tokens[3][0], valid_tokens[4][0], valid_tokens[5][0]
+};
 // will represent the indexes in the for loop
 int x, y;
 // the 3 correct answers and the 3 guesses
@@ -188,7 +212,7 @@ void cinput (int row, WINDOW * given_win) {
         echo();
         curs_set(1);
 
-        wmove(given_win, 4, 37);
+        wmove(given_win, 4, 38);
 
         char given[10];
         wgetstr(given_win, given);
@@ -197,7 +221,7 @@ void cinput (int row, WINDOW * given_win) {
         char given_2 = given[1];
         char given_3 = given[2];
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         string gs1 (1, given_1);
         string gs2 (1, given_2);
@@ -284,6 +308,12 @@ bool is_victory () {
 
 bool act_victory ();
 
+bool act_loss ();
+
+void clear_variables();
+
+void gen_rand();
+
 int main (int argc, char* argv[]) {
     try {
     	overarch(); 
@@ -302,36 +332,54 @@ int main (int argc, char* argv[]) {
 }
 
 void overarch() {
-    /*
+    
     preparatory::antecedent();
-    preparatory::startup();
-    */
+    
     preparatory::begin_ncurses();
-    /*
-    WINDOW * Board;
-    Board = newwin(17, 80, 0, 0);
-    WINDOW * Text;
-    Text = newwin(7, 80, 17, 0);
-    wbkgd(Board, COLOR_PAIR(1));
-    wbkgd(Text, COLOR_PAIR(1));
 
-    bool given_out = false;
-    for (int i = 0; i < 7; ++i)
-    {
-        coutput(Board, Text);
-        cinput(i, Text);
-        result(i);
-        given_out = is_victory();
-        if (given_out == true) {
-            break;
+    bool play_again = false;
+    do {
+        preparatory::startup();
+
+        clear_variables();
+        gen_rand();
+
+        WINDOW * Board;
+        Board = newwin(17, 80, 0, 0);
+        WINDOW * Text;
+        Text = newwin(7, 80, 17, 0);
+        wbkgd(Board, COLOR_PAIR(1));
+        wbkgd(Text, COLOR_PAIR(1));
+
+        bool given_out = false;
+        for (int i = 0; i < 7; ++i)
+        {
+            coutput(Board, Text);
+            cinput(i, Text);
+            result(i);
+            given_out = is_victory();
+            if (given_out == true) {
+                break;
+            }
         }
-    }
 
-    delwin(Board);
-    delwin(Text);
-*/
-    act_victory();
+        wclear(Board);
+        wclear(Text);
 
+        delwin(Board);
+        delwin(Text);
+
+        wclear(stdscr);
+        clear();
+
+        if (given_out == true) {
+            play_again = act_victory();
+        } else {
+            play_again = act_loss();
+        }
+        clear();
+        wclear(stdscr);
+    } while (play_again);
     preparatory::end_ncurses();
 }
 
@@ -397,6 +445,127 @@ bool act_victory () {
     } else {
         return false;
     }
+}
+
+bool act_loss () {
+    primary::game_screen_5l(primary::game_5_mtext, primary::game_5_border);
+
+    primary::game_screen_5p(primary::game_5_mtext, primary::game_5_border);
+
+    // prepare the default game state
+    primary::Input_state given_game_choice_2 = primary::Input_state::Play_again;
+
+    // make out that first change
+    primary::game_choice_printer_2(given_game_choice_2, primary::game_5_stext);
+
+    // initilize the input char
+    int given_game_switcher_2 = 0;
+
+    // whether the person has made a choice yet
+    bool game_got_in_2 = false;
+
+    while (!game_got_in_2) {
+        given_game_switcher_2 = getch();
+
+        switch(given_game_switcher_2) {
+            case KEY_RIGHT:
+            case KEY_LEFT:
+                if (given_game_choice_2 == primary::Input_state::Play_again){
+                    given_game_choice_2 = primary::Input_state::Go_Out;
+                } else if (given_game_choice_2 == primary::Input_state::Go_Out) {
+                    given_game_choice_2 = primary::Input_state::Play_again;
+                }
+
+                primary::game_choice_printer_2(given_game_choice_2, primary::game_5_stext);
+                break;
+            case 10:
+                game_got_in_2 = true;
+                break;
+        }
+    }
+
+    if (given_game_choice_2 == primary::Input_state::Play_again) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void clear_variables() {
+    guess = 
+    {
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"}
+    };
+    validity = 
+    {
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"},
+        {"_", "_", "_"}
+    };
+    choiceClr[0] = valid_tokens[0][0];
+    choiceClr[1] = valid_tokens[1][0];
+    choiceClr[2] = valid_tokens[2][0];
+    choiceClr[3] = valid_tokens[3][0];
+    choiceClr[4] = valid_tokens[4][0];
+    choiceClr[5] = valid_tokens[5][0];
+    /*
+    choiceClr = {
+        valid_tokens[0][0], valid_tokens[1][0], valid_tokens[2][0], 
+        valid_tokens[3][0], valid_tokens[4][0], valid_tokens[5][0]
+    };*/
+}
+
+void gen_rand() {
+    // gets the number of seconds
+    // since a long, long, time ago
+    uint32_t now = std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+    // I don't know what this is–
+    // does it set up the random number generator?
+    typedef std::mt19937 MyRNG;  // the Mersenne Twister with a popular choice of parameters
+    MyRNG rand_no_gen;
+    rand_no_gen.seed(now);
+    // this apparently sets up the distribution.
+    std::uniform_int_distribution<uint32_t> uint_dist6(0,5); // range [0,5]?
+    // now, let's get our number!
+    auto dice_maybe = std::bind(uint_dist6, rand_no_gen);
+    int rand_1 = dice_maybe();
+    int rand_2 = dice_maybe();
+    int rand_3 = dice_maybe();
+    bool is_different = false;
+    while (!is_different) {
+        if (rand_1 == rand_3){
+            rand_3 = dice_maybe();
+            is_different = false;
+        } else {
+            is_different = true;
+        }
+    }
+    is_different = false;
+    while (!is_different) {
+        if ((rand_1 == rand_2) || (rand_2 == rand_3)) {
+            rand_2 = dice_maybe();
+            is_different = false;
+        } else {
+            is_different = true;
+        }
+    }
+
+    // attach the values to the color array
+    color[0] = valid_tokens[rand_1];
+    color[1] = valid_tokens[rand_2];
+    color[2] = valid_tokens[rand_3];
 }
 
 // ==> Loaders
@@ -549,7 +718,7 @@ void primary::game_screen_3l(
     std::vector<Output_con>& game_3_border
 ) {
     // the subtitel
-    preparatory::priv::center_lr(game_3_subtitle, "And your guess is: (Input 3 letters, then an enter)", 1, 60);
+    preparatory::priv::center_lr(game_3_subtitle, "And your guess is: (Input 3 letters, no spaces, then an enter)", 1, 60);
     preparatory::priv::valid_color_loader(game_3_subtitle, valid_tokens, 2);
     // the border of the inputs
     preparatory::priv::scanner(game_3_border, {"╓", "║", "╙"}, 3, 30);
@@ -899,6 +1068,62 @@ void primary::game_screen_4l(
     );
 }
 
+void primary::game_screen_5l(
+    std::vector <Output_con>& game_5_mtext,
+    std::vector <Output_con>& game_5_border
+) {
+    preparatory::priv::center_lr(
+        game_5_mtext, 
+        "Sorry! It doesn't look like you were able to guess the code.", 
+        8, 60
+    );
+    preparatory::priv::center_lr(
+        game_5_mtext, 
+        ("It was "+color[0]+color[1]+color[2]+"."), 
+        9, 60
+    );
+    preparatory::priv::center_lr(
+        game_5_mtext, 
+        "Would you like to try again?", 
+        11, 60
+    );
+
+    preparatory::priv::scanner(
+        game_5_border,
+        {"╒", "│", "╘"},
+        12, 20,
+        Output_con::Coloration::Naught
+    );
+    for (int i = 0; i <= 17; ++i) {
+        preparatory::priv::scanner(
+            game_5_border,
+            {"═", " ", "═"},
+            12, (21 + i),
+            Output_con::Coloration::Naught
+        );
+    }
+    preparatory::priv::scanner(
+        game_5_border,
+        {"╤", "│", "╧"},
+        12, 39,
+        Output_con::Coloration::Naught
+    );
+    for (int i = 0; i <= 17; ++i) {
+        preparatory::priv::scanner(
+            game_5_border,
+            {"═", " ", "═"},
+            12, (40 + i),
+            Output_con::Coloration::Naught
+        );
+    }
+    preparatory::priv::scanner(
+        game_5_border,
+        {"╕", "│", "╛"},
+        12, 58,
+        Output_con::Coloration::Naught
+    );
+}
+
 // ==> Printers
 
 void primary::game_screen_2p(
@@ -959,6 +1184,18 @@ void primary::game_screen_4p(
     game_4_sbord.clear();
 }
 
+void primary::game_screen_5p(
+    std::vector <Output_con>& game_5_mtext,
+    std::vector <Output_con>& game_5_border
+) {
+    preparatory::priv::printcon(game_5_mtext);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    preparatory::priv::printcon(game_5_border);
+
+    game_5_mtext.clear();
+    game_5_border.clear();
+}
+
 void primary::game_choice_printer_1(
     primary::Input_state given_choice, 
     std::vector<Output_con>& granvec
@@ -967,7 +1204,7 @@ void primary::game_choice_printer_1(
         preparatory::priv::passer_lr(
             granvec,
             "Yes",
-            22, 28, // 29?
+            21, 28, // 29?
             Output_con::Coloration::Yellow,
             Output_con::Attribute::Reversed,
             false
@@ -975,7 +1212,7 @@ void primary::game_choice_printer_1(
         preparatory::priv::passer_lr(
             granvec,
             "No",
-            22, 48, // 49?
+            21, 48, // 49?
             Output_con::Coloration::Yellow,
             Output_con::Attribute::Naught,
             false
@@ -986,7 +1223,7 @@ void primary::game_choice_printer_1(
         preparatory::priv::passer_lr(
             granvec,
             "Yes",
-            22, 28, // 29?
+            21, 28, // 29?
             Output_con::Coloration::Yellow,
             Output_con::Attribute::Naught,
             false
@@ -994,8 +1231,55 @@ void primary::game_choice_printer_1(
         preparatory::priv::passer_lr(
             granvec,
             "No",
-            22, 48, // 49?
+            21, 48, // 49?
             Output_con::Coloration::Yellow,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::printcon(granvec);
+        granvec.clear();
+    } else {
+        error("Absurd victory choice given");
+    }
+}
+
+void primary::game_choice_printer_2(
+    primary::Input_state given_choice, 
+    std::vector<Output_con>& granvec
+) {
+    if (given_choice == primary::Input_state::Play_again) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Yes",
+            13, 28, // 29?
+            Output_con::Coloration::Naught,
+            Output_con::Attribute::Reversed,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "No",
+            13, 48, // 49?
+            Output_con::Coloration::Naught,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::printcon(granvec);
+        granvec.clear();
+    } else if (given_choice == primary::Input_state::Go_Out) {
+        preparatory::priv::passer_lr(
+            granvec,
+            "Yes",
+            13, 28, // 29?
+            Output_con::Coloration::Naught,
+            Output_con::Attribute::Naught,
+            false
+        );
+        preparatory::priv::passer_lr(
+            granvec,
+            "No",
+            13, 48, // 49?
+            Output_con::Coloration::Naught,
             Output_con::Attribute::Reversed,
             false
         );
@@ -1013,35 +1297,7 @@ void primary::arrsortstr( std::vector< std::vector<std::string> >& arr ) {
         string s1 = arr[row][0];
         // check if this first one is valid
         if (s1 == "0" || s1 == "1" || s1 == "2") {
-            int si1 = stoi(s1);
-            // begin work with the second thing
-            string s2 = arr[row][1];
-            int si2 = stoi(s2);
-            if (si2 > si1) {
-                int tempi = si2;
-                si2 = si1;
-                si1 = tempi;
-                arr[row][1] = s1;
-                arr[row][0] = s2;
-            }
-            // begin work with the thrd value
-            string s3 = arr[row][2];
-            int si3 = stoi(s3);
-            if (si3 > si1) {
-                int tempi = si3;
-                si3 = si2;
-                si2 = si1;
-                si1 = tempi;
-                arr[row][2] = s2;
-                arr[row][1] = s1;
-                arr[row][0] = s3;
-            } else if (si3 > si2) {
-                int tempi = si3;
-                si3 = si2;
-                si2 = tempi;
-                arr[row][2] = s2;
-                arr[row][1] = s3;
-            }
+           std::sort(arr[row].begin(), arr[row].end(), greater<std::string>());
         } else if (s1 != "_") {
             error("Invalid validity");
         }
